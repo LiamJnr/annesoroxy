@@ -1,0 +1,22 @@
+.checkout-panel { grid-area: checkout; display: none; max-width: 480px; padding: 1.1rem; border: 1px solid var(--purple); background: var(--purple-pale); }
+.checkout-panel.is-open { display: block; animation: reveal 0.26s ease both; }
+.checkout-panel__header { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.checkout-panel__eyebrow { margin: 0; color: var(--purple-deep); font-size: 0.6rem; letter-spacing: 0.11em; }
+.checkout-panel__close { width: 1.5rem; height: 1.5rem; margin: -0.25rem -0.25rem 0 0; padding: 0; border: 0; color: var(--purple-deep); background: transparent; cursor: pointer; font-size: 1.45rem; line-height: 1; }
+.checkout-panel__close:hover,
+.checkout-panel__close:focus-visible { color: var(--ink); outline: 1px solid var(--purple-deep); outline-offset: 2px; }
+.checkout-panel h2 { margin: 1.35rem 0 0.45rem; font-family: "Instrument Serif", Georgia, serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; letter-spacing: -0.04em; line-height: 0.9; }
+.checkout-panel__note { margin: 0; color: rgba(16, 16, 15, 0.72); font-size: 0.67rem; line-height: 1.55; }
+.checkout-slot { min-height: 4rem; margin-top: 1.1rem; border: 1px dashed rgba(53, 20, 118, 0.48); color: var(--purple-deep); }
+.checkout-status { display: grid; min-height: 4rem; place-items: center; margin: 0; padding: 0.8rem; font-size: 0.58rem; letter-spacing: 0.11em; text-align: center; }
+.checkout-status.is-error { color: #8b1d3f; }
+.checkout-form { padding: 1rem; background: rgba(244, 240, 232, 0.72); }
+.checkout-submit { display: flex; justify-content: space-between; width: 100%; margin-top: 1rem; padding: 0.83rem 0.9rem; border: 1px solid var(--purple-deep); color: var(--paper); background: var(--purple-deep); cursor: pointer; font-size: 0.65rem; letter-spacing: 0.07em; text-transform: uppercase; }
+.checkout-submit:disabled { cursor: wait; opacity: 0.7; }
+.checkout-submit:hover,
+.checkout-submit:focus-visible { color: var(--purple-deep); background: transparent; outline: 0; }
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(-0.45rem); }
+  to { opacity: 1; transform: translateY(0); }
+}

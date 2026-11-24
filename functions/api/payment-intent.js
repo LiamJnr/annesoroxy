@@ -115,12 +115,21 @@ export async function onRequestPost(context) {
   }
 
   const intent = handypayPayload.data;
+  if (typeof intent.payment_intent_id !== "string") {
+    await env.PAYMENTS_DB.prepare(
+      "UPDATE checkout_reservations SET status = 'creation_failed' WHERE id = ?",
+    )
+      .bind(reservationId)
+      .run();
+    return json({ error: "Unable to start secure checkout. Please try again." }, 502);
+  }
+
   await env.PAYMENTS_DB.prepare(
     `UPDATE checkout_reservations
         SET handypay_intent_id = ?, status = 'checkout_ready'
       WHERE id = ?`,
   )
-    .bind(intent.id, reservationId)
+    .bind(intent.payment_intent_id, reservationId)
     .run();
 
   // HandyPay documents these as the only browser-safe fields for embedded checkout.

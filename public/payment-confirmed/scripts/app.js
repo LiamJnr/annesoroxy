@@ -1,3 +1,5 @@
+import { fetchPaymentStatus } from "./payment-status.js";
+
 const title = document.querySelector("#confirmation-title");
 const message = document.querySelector("#confirmation-message");
 const homeLink = document.querySelector("#home-link");
@@ -18,22 +20,14 @@ async function checkPaymentStatus() {
   }
 
   try {
-    const response = await fetch(`/api/payment-status?reservation_id=${encodeURIComponent(reservationId)}`, {
-      cache: "no-store",
-    });
-    const payment = await response.json();
+    const paymentStatus = await fetchPaymentStatus(reservationId);
 
-    if (!response.ok) {
-      showFinal("We couldn’t find that payment.", "Please return home and try again.");
-      return;
-    }
-
-    if (payment.status === "paid") {
+    if (paymentStatus === "paid") {
       showFinal("You’re all set.", "Your payment was securely confirmed. Thank you.");
       return;
     }
 
-    if (payment.status === "failed") {
+    if (paymentStatus === "failed") {
       showFinal("Your payment wasn’t completed.", "No confirmed payment was received. You can try again whenever you’re ready.");
       return;
     }
@@ -45,9 +39,9 @@ async function checkPaymentStatus() {
     }
 
     window.setTimeout(checkPaymentStatus, 2000);
-  } catch {
+  } catch (error) {
     checks += 1;
-    if (checks >= maximumChecks) {
+    if (checks >= maximumChecks || error.message === "Payment reference not found.") {
       showFinal("Confirmation is temporarily unavailable.", "Please check back shortly.");
       return;
     }
