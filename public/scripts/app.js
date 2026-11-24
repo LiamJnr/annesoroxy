@@ -1,6 +1,6 @@
-import { createCheckoutController } from "./checkout-controller.js";
-import { paymentOptions, stripeAppearance } from "./config.js";
-import { createCheckoutUi } from "./checkout-ui.js";
+import { createCheckoutController } from "./checkout-controller.js?v=20261124-2";
+import { paymentOptions, stripeAppearance } from "./config.js?v=20261124-2";
+import { createCheckoutUi } from "./checkout-ui.js?v=20261124-2";
 
 const ui = createCheckoutUi();
 const checkout = createCheckoutController({ ui, appearance: stripeAppearance });

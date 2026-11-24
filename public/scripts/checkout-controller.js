@@ -1,10 +1,12 @@
-import { createPaymentIntent } from "./payment-api.js";
-import { createStripeClient, loadStripe } from "./stripe-loader.js";
+import { createPaymentIntent } from "./payment-api.js?v=20261124-2";
+import { createStripeClient, loadStripe } from "./stripe-loader.js?v=20261124-2";
 
 export function createCheckoutController({ ui, appearance }) {
   let activeCheckout;
   let mountedPaymentElement;
   let attempt = 0;
+  let isPreparing = false;
+  let isSubmitting = false;
 
   function clearMountedCheckout() {
     mountedPaymentElement?.unmount();
@@ -15,7 +17,10 @@ export function createCheckoutController({ ui, appearance }) {
   }
 
   async function select(paymentType, label, options = {}) {
+    if (isPreparing) return;
+
     const currentAttempt = ++attempt;
+    isPreparing = true;
     ui.setPanelTitle(label);
     ui.openPanel();
     clearMountedCheckout();
@@ -46,19 +51,24 @@ export function createCheckoutController({ ui, appearance }) {
       if (currentAttempt !== attempt) return;
       ui.setStatus(error.message || "Checkout could not be prepared.", true);
       ui.setAvailability("This payment option is unavailable right now.");
+    } finally {
+      if (currentAttempt === attempt) isPreparing = false;
     }
   }
 
   function close() {
     attempt += 1;
+    isPreparing = false;
+    isSubmitting = false;
     clearMountedCheckout();
     ui.closePanel();
     ui.setAvailability("Checkout opens only when you choose.");
   }
 
   async function submit() {
-    if (!activeCheckout) return;
+    if (!activeCheckout || isSubmitting) return;
 
+    isSubmitting = true;
     ui.setSubmitting(true);
     ui.setStatus("Submitting secure payment…");
 
@@ -87,6 +97,7 @@ export function createCheckoutController({ ui, appearance }) {
     } catch {
       ui.setStatus("Payment could not be submitted. Please try again.", true);
     } finally {
+      isSubmitting = false;
       ui.setSubmitting(false);
     }
   }

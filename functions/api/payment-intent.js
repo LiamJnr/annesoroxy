@@ -66,13 +66,14 @@ export async function onRequestPost(context) {
   }
 
   const ALLOWED_TIP_AMOUNTS = new Set([1500, 2500, 5000, 7500, 10000]);
+  const isPriority = paymentType === "custom" && payload?.priority === true;
   let finalAmount = offering.amount_cents;
   let finalLabel = offering.label;
 
   if (paymentType === "tip" && payload?.amount && ALLOWED_TIP_AMOUNTS.has(Number(payload.amount))) {
     finalAmount = Number(payload.amount);
     finalLabel = `Supporter tip ($${finalAmount / 100})`;
-  } else if (paymentType === "custom" && payload?.priority === true) {
+  } else if (isPriority) {
     finalAmount = offering.amount_cents + 1000;
     finalLabel = `${offering.label} (Priority Rush)`;
   }
@@ -82,10 +83,10 @@ export async function onRequestPost(context) {
 
   await env.PAYMENTS_DB.prepare(
     `INSERT INTO checkout_reservations
-      (id, payment_type, amount_cents, currency, status, created_at)
-     VALUES (?, ?, ?, ?, 'pending', ?)`,
+      (id, payment_type, amount_cents, currency, priority, status, created_at)
+     VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
   )
-    .bind(reservationId, offering.payment_type, finalAmount, offering.currency, createdAt)
+    .bind(reservationId, offering.payment_type, finalAmount, offering.currency, Number(isPriority), createdAt)
     .run();
 
   let handypayResponse;
@@ -104,6 +105,7 @@ export async function onRequestPost(context) {
         metadata: {
           reservation_id: reservationId,
           payment_type: offering.payment_type,
+          priority: String(isPriority),
         },
       }),
     });

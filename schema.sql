@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS checkout_reservations (
   payment_type TEXT NOT NULL REFERENCES payment_offerings(payment_type),
   amount_cents INTEGER NOT NULL,
   currency TEXT NOT NULL,
+  priority INTEGER NOT NULL DEFAULT 0 CHECK (priority IN (0, 1)),
   handypay_intent_id TEXT UNIQUE,
   status TEXT NOT NULL CHECK (status IN ('pending', 'checkout_ready', 'creation_failed', 'paid', 'failed')),
   created_at INTEGER NOT NULL,

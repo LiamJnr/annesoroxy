@@ -5,6 +5,7 @@ html { background: var(--paper); }
 body {
   min-width: 320px;
   margin: 0;
+  overflow-x: hidden;
   color: var(--ink);
   background: var(--paper);
   font-family: "DM Mono", monospace;
