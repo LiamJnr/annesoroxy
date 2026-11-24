@@ -11,7 +11,6 @@
     radial-gradient(circle at 79% 15%, #f3d1ff 0 3%, transparent 19%),
     radial-gradient(ellipse at 23% 83%, #3e148f 0 4%, transparent 52%),
     linear-gradient(144deg, #0f0623 8%, #42147e 45%, #a462e4 69%, #d5b2fb 100%);
-  box-shadow: 14px 15px 0 var(--purple);
 }
 
 .media-placeholder::before {
