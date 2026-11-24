@@ -83,6 +83,7 @@ export async function onRequestPost(context) {
       headers: {
         Authorization: `Bearer ${env.HANDYPAY_API_KEY}`,
         "Content-Type": "application/json",
+        "Idempotency-Key": reservationId,
       },
       body: JSON.stringify({
         amount: offering.amount_cents,
