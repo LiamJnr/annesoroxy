@@ -115,13 +115,27 @@ document.querySelectorAll("[data-payment-type]").forEach((button) => {
 
 closeButton.addEventListener("click", closeCheckout);
 
-checkoutForm.addEventListener("submit", (event) => {
+checkoutForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (!activeCheckout) return;
 
-  // Payment submission and redirect are intentionally deferred until the webhook-backed
-  // confirmation page is added. A browser result must not be treated as payment success.
-  if (activeCheckout) {
-    setStatus("Final payment confirmation will be enabled with server verification.");
-    checkoutSubmit.blur();
+  checkoutSubmit.disabled = true;
+  setStatus("Submitting secure payment…");
+
+  const confirmationUrl = new URL("/payment-confirmed/", window.location.origin);
+  confirmationUrl.searchParams.set("reservation_id", activeCheckout.reservationId);
+
+  const result = await activeCheckout.stripe.confirmPayment({
+    elements: activeCheckout.elements,
+    confirmParams: { return_url: confirmationUrl.toString() },
+    redirect: "if_required",
+  });
+
+  if (result.error) {
+    checkoutSubmit.disabled = false;
+    setStatus(result.error.message || "Payment could not be submitted.", true);
+    return;
   }
+
+  window.location.assign(confirmationUrl.toString());
 });

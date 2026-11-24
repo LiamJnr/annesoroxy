@@ -26,6 +26,12 @@ CREATE TABLE IF NOT EXISTS checkout_reservations (
 CREATE INDEX IF NOT EXISTS idx_checkout_reservations_intent
   ON checkout_reservations(handypay_intent_id);
 
+CREATE TABLE IF NOT EXISTS handypay_webhook_events (
+  id TEXT PRIMARY KEY,
+  event_type TEXT NOT NULL,
+  received_at INTEGER NOT NULL
+);
+
 -- Example configuration — replace every value with the approved live configuration,
 -- then set active = 1 only when ready to accept that payment type.
 --

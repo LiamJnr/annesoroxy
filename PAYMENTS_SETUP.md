@@ -15,3 +15,9 @@ This project includes `POST /api/payment-intent` as a Cloudflare Pages Function.
 Each successful request to the endpoint increments `checkout_used` for its payment type before the PaymentIntent is created. It is intentionally **not** refunded when a shopper abandons the checkout form. A failed request to HandyPay is logged as `creation_failed`, but the allocation stays consumed only after the form's checkout allocation is claimed; this matches the stated allocation policy.
 
 The next client-side integration will call this endpoint only after the visitor selects an option, then use the returned `clientSecret`, `publishableKey`, and `stripeAccount` to mount the embedded checkout fields.
+
+## Webhook confirmation
+
+After deploying, register `https://annesoroxy.com/api/handypay-webhook` with HandyPay for `payment_intent.succeeded` and `payment_intent.payment_failed`. Store the one-time signing secret as the encrypted Pages secret `HANDYPAY_WEBHOOK_SECRET`.
+
+Run `migrations/0001_handypay_webhook_events.sql` against the existing D1 database before deploying the webhook function. The `/payment-confirmed/` page polls a safe status endpoint and shows payment success only after a valid signed webhook records the reservation as `paid`.
