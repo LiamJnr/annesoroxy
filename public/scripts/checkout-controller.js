@@ -61,22 +61,34 @@ export function createCheckoutController({ ui, appearance }) {
 
     ui.setSubmitting(true);
     ui.setStatus("Submitting secure payment…");
-    const confirmationUrl = new URL("/payment-confirmed/", window.location.origin);
-    confirmationUrl.searchParams.set("reservation_id", activeCheckout.reservationId);
 
-    const result = await activeCheckout.stripe.confirmPayment({
-      elements: activeCheckout.elements,
-      confirmParams: { return_url: confirmationUrl.toString() },
-      redirect: "if_required",
-    });
+    try {
+      const validation = await activeCheckout.elements.submit();
+      if (validation.error) {
+        ui.setStatus(validation.error.message || "Please review your payment details.", true);
+        return;
+      }
 
-    if (result.error) {
+      const confirmationUrl = new URL("/payment-confirmed/", window.location.origin);
+      confirmationUrl.searchParams.set("reservation_id", activeCheckout.reservationId);
+
+      const result = await activeCheckout.stripe.confirmPayment({
+        elements: activeCheckout.elements,
+        confirmParams: { return_url: confirmationUrl.toString() },
+        redirect: "if_required",
+      });
+
+      if (result.error) {
+        ui.setStatus(result.error.message || "Payment could not be submitted.", true);
+        return;
+      }
+
+      window.location.assign(confirmationUrl.toString());
+    } catch {
+      ui.setStatus("Payment could not be submitted. Please try again.", true);
+    } finally {
       ui.setSubmitting(false);
-      ui.setStatus(result.error.message || "Payment could not be submitted.", true);
-      return;
     }
-
-    window.location.assign(confirmationUrl.toString());
   }
 
   return { close, select, submit };
