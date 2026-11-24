@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "roxy-content-creator-site",
+  "pages_build_output_dir": ".",
+  "d1_databases": [
+    {
+      "binding": "PAYMENTS_DB",
+      "database_name": "roxy-payments",
+      "database_id": "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+    }
+  ]
+}
