@@ -14,7 +14,7 @@ export function createCheckoutController({ ui, appearance }) {
     ui.paymentElementTarget.replaceChildren();
   }
 
-  async function select(paymentType, label) {
+  async function select(paymentType, label, options = {}) {
     const currentAttempt = ++attempt;
     ui.setPanelTitle(label);
     ui.openPanel();
@@ -23,7 +23,7 @@ export function createCheckoutController({ ui, appearance }) {
     ui.setAvailability("Preparing your selected checkout.");
 
     try {
-      const checkout = await createPaymentIntent(paymentType);
+      const checkout = await createPaymentIntent(paymentType, options);
       const Stripe = await loadStripe();
       if (currentAttempt !== attempt) return;
 

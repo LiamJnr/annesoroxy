@@ -9,6 +9,7 @@ export function createCheckoutUi() {
   const submitButton = document.querySelector(".checkout-submit");
 
   function setAvailability(message) {
+    if (!availability) return;
     const dot = document.createElement("span");
     availability.replaceChildren(dot, document.createTextNode(` ${message}`));
   }

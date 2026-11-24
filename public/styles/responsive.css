@@ -1,6 +1,6 @@
 @media (max-width: 720px) {
   .landing { padding: 1.1rem; }
-  .stage { grid-template-columns: 1fr; grid-template-areas: "copy" "media" "actions" "checkout" "availability"; margin-block: 1.5rem; padding: 0; gap: 1.5rem; }
+  .stage { grid-template-columns: 1fr; grid-template-areas: "copy" "media" "actions" "checkout"; margin-block: 1.5rem; padding: 0; gap: 1.5rem; }
   h1 { font-size: clamp(3.45rem, 16.1vw, 5.5rem); }
   .media-placeholder { min-height: 0; aspect-ratio: 5 / 4; }
   footer { font-size: 0.53rem; }

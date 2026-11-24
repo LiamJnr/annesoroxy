@@ -1,8 +1,8 @@
-export async function createPaymentIntent(paymentType) {
+export async function createPaymentIntent(paymentType, options = {}) {
   const response = await fetch("/api/payment-intent", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ paymentType }),
+    body: JSON.stringify({ paymentType, ...options }),
   });
 
   const contentType = response.headers.get("content-type") ?? "";

@@ -29,18 +29,40 @@
         </div>
 
         <div class="actions" aria-label="Choose an option">
-          <button class="action-button primary" type="button" data-payment-type="custom">
-            <span>Request something custom</span>
-            <span aria-hidden="true">↗</span>
+          <button class="action-button primary" type="button" id="custom-toggle" aria-expanded="false" aria-controls="custom-tray">
+            <span>Request custom content</span>
           </button>
+          <div class="custom-tray" id="custom-tray" hidden aria-label="Custom content queue">
+            <div class="queue-status">
+              <span class="queue-status__dot" aria-hidden="true"></span>
+              <p class="queue-status__text">You are currently <strong id="queue-number">#14</strong> in queue for custom content.</p>
+            </div>
+            <div class="priority-options" role="radiogroup" aria-label="Queue priority">
+              <button class="priority-pill is-selected" type="button" role="radio" aria-checked="true" data-priority="false">Standard Queue</button>
+              <button class="priority-pill" type="button" role="radio" aria-checked="false" data-priority="true">Priority Rush (+$10)</button>
+            </div>
+            <button class="custom-submit" type="button" id="custom-submit">
+              <span>Continue with Standard Queue</span>
+            </button>
+          </div>
           <button class="action-button" type="button" data-payment-type="premade">
-            <span>Explore what’s ready</span>
-            <span aria-hidden="true">↗</span>
+            <span>Pre-made content</span>
           </button>
-          <button class="action-button" type="button" data-payment-type="tip">
+          <button class="action-button" type="button" id="tip-toggle" aria-expanded="false" aria-controls="tip-tray">
             <span>Leave a little something</span>
-            <span aria-hidden="true">↗</span>
           </button>
+          <div class="tip-tray" id="tip-tray" hidden aria-label="Choose tip amount">
+            <div class="tip-pills" role="radiogroup" aria-label="Select tip amount">
+              <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="15">$15</button>
+              <button class="tip-pill is-selected" type="button" role="radio" aria-checked="true" data-amount="25">$25</button>
+              <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="50">$50</button>
+              <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="75">$75</button>
+              <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="100">$100</button>
+            </div>
+            <button class="tip-submit" type="button" id="tip-submit">
+              <span>Continue with $25</span>
+            </button>
+          </div>
         </div>
 
         <aside class="checkout-panel" id="checkout-panel" aria-hidden="true" aria-labelledby="checkout-title">
@@ -58,8 +80,6 @@
             </form>
           </div>
         </aside>
-
-        <p class="availability" aria-live="polite"><span></span> Checkout opens only when you choose.</p>
       </section>
 
       <footer>
