@@ -1,7 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "roxy-content-creator-site",
-  "pages_build_output_dir": ".",
+  "name": "annesoroxy",
+  "pages_build_output_dir": "./public",
   "d1_databases": [
     {
       "binding": "PAYMENTS_DB",
