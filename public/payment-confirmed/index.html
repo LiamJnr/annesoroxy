@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20261124-6" />
+    <link rel="stylesheet" href="styles.css?v=20261124-7" />
   </head>
   <body>
     <main class="confirmation">
@@ -17,12 +17,12 @@
       <h1 id="confirmation-title">Confirming your payment.</h1>
       <p id="confirmation-message" class="message" aria-live="polite">Please keep this page open while we verify your transaction.</p>
 
-      <section id="receipt-prompt" class="snapchat-banner" hidden aria-label="Receipt action required">
+      <section id="receipt-prompt" class="snapchat-banner" hidden aria-label="Action required">
         <div>
           <p class="snapchat-banner__tag">ACTION REQUIRED</p>
-          <p class="snapchat-banner__text">Open your receipt, screenshot it, then send it to Snapchat <strong>@annesoroxy</strong> to begin your request.</p>
+          <p class="snapchat-banner__text">Your custom request has been secured. Download your official receipt to confirm and start your request on Snapchat.</p>
         </div>
-        <button type="button" class="action-pill" id="receipt-reveal">View Receipt</button>
+        <button type="button" class="action-pill" id="receipt-reveal">Download Receipt</button>
       </section>
 
       <!-- Luxury Security Receipt Card -->
@@ -45,11 +45,11 @@
             <span class="receipt-label">ITEM</span>
             <span class="receipt-value" id="receipt-item">Custom Content Request</span>
           </div>
-          <div class="receipt-row" id="receipt-priority-row">
+          <div class="receipt-row" id="receipt-priority-row" hidden>
             <span class="receipt-label">PRIORITY PUSH</span>
             <span class="receipt-value" id="receipt-priority">Included</span>
           </div>
-          <div class="receipt-row" id="receipt-premade-row">
+          <div class="receipt-row" id="receipt-premade-row" hidden>
             <span class="receipt-label">PRE-MADE ACCESS</span>
             <span class="receipt-value" id="receipt-premade">Included</span>
           </div>
@@ -70,6 +70,10 @@
             <span class="receipt-label">TIMESTAMP</span>
             <span class="receipt-value" id="receipt-time">—</span>
           </div>
+          <div class="receipt-meta-item">
+            <span class="receipt-label">AUTH CODE</span>
+            <code class="receipt-code" id="receipt-auth">—</code>
+          </div>
         </div>
 
         <div class="receipt-card__footer">
@@ -80,9 +84,9 @@
 
       <div class="confirmation-actions">
         <a id="snapchat-link" class="action-pill" href="https://snapchat.com/add/annesoroxy" target="_blank" rel="noopener noreferrer" hidden>Open Snapchat</a>
-        <a id="home-link" class="action-pill secondary" href="/" hidden>Return to Home</a>
+        <a id="home-link" class="action-pill secondary" href="/" hidden>Return Home</a>
       </div>
     </main>
-    <script type="module" src="scripts/app.js?v=20261124-6"></script>
+    <script type="module" src="scripts/app.js?v=20261124-7"></script>
   </body>
 </html>
