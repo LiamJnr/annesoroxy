@@ -1,4 +1,4 @@
-import { fetchPaymentStatus } from "./payment-status.js?v=20261124-7";
+import { fetchPaymentStatus } from "./payment-status.js?v=20261124-8";
 
 const title = document.querySelector("#confirmation-title");
 const message = document.querySelector("#confirmation-message");
@@ -53,9 +53,14 @@ function showFinal(heading, detail, isSuccess = false) {
   if (receiptCard) receiptCard.hidden = true;
   if (snapchatLink) snapchatLink.hidden = true;
   if (homeLink) homeLink.hidden = false;
-  if (!isSuccess && mark) {
-    mark.textContent = "×";
-    mark.style.background = "#8b1d3f";
+  if (mark) {
+    if (isSuccess) {
+      mark.textContent = "✓";
+      mark.style.background = "";
+    } else {
+      mark.textContent = "×";
+      mark.style.background = "#8b1d3f";
+    }
   }
 }
 
@@ -122,6 +127,11 @@ async function checkPaymentStatus() {
     const payment = await fetchPaymentStatus(reservationId);
 
     if (payment.status === "paid") {
+      if (mark) {
+        mark.textContent = "✓";
+        mark.style.background = "";
+      }
+
       if (payment.paymentType === "tip") {
         showFinal("Thank you for the support.", "Your contribution has been received. I truly appreciate you.", true);
         if (receiptCard) receiptCard.hidden = true;
