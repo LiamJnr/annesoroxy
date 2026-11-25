@@ -1,5 +1,6 @@
 import { createPaymentIntent } from "./payment-api.js?v=20261124-3";
 import { createStripeClient, loadStripe } from "./stripe-loader.js?v=20261124-3";
+import { SPINNER_SVG } from "./checkout-ui.js";
 
 export function createCheckoutController({ ui, appearance }) {
   let activeCheckout;
@@ -21,15 +22,23 @@ export function createCheckoutController({ ui, appearance }) {
 
     const currentAttempt = ++attempt;
     isPreparing = true;
+
+    const { triggerButton, ...apiOptions } = options;
+    const originalTriggerHtml = triggerButton ? triggerButton.innerHTML : "";
+    if (triggerButton) {
+      triggerButton.disabled = true;
+      triggerButton.innerHTML = `<span class="button-spinner-wrap">${SPINNER_SVG}</span><span>Loading…</span>`;
+    }
+
     ui.setPanelTitle(label);
     ui.setSubmitLabel(paymentType === "tip" ? "Send Support" : "Unlock Access");
     ui.openPanel();
     clearMountedCheckout();
-    ui.setStatus("Preparing checkout…");
+    ui.setLoading("Preparing checkout…");
     ui.setAvailability("Preparing your selected checkout.");
 
     try {
-      const checkout = await createPaymentIntent(paymentType, options);
+      const checkout = await createPaymentIntent(paymentType, apiOptions);
       const Stripe = await loadStripe();
       if (currentAttempt !== attempt) return;
 
@@ -53,6 +62,10 @@ export function createCheckoutController({ ui, appearance }) {
       ui.setStatus(error.message || "Checkout could not be prepared.", true);
       ui.setAvailability("This payment option is unavailable right now.");
     } finally {
+      if (triggerButton && originalTriggerHtml) {
+        triggerButton.disabled = false;
+        triggerButton.innerHTML = originalTriggerHtml;
+      }
       if (currentAttempt === attempt) isPreparing = false;
     }
   }
@@ -71,7 +84,7 @@ export function createCheckoutController({ ui, appearance }) {
 
     isSubmitting = true;
     ui.setSubmitting(true);
-    ui.setStatus("Authorizing…");
+    ui.setLoading("Authorizing…");
 
     try {
       const validation = await activeCheckout.elements.submit();

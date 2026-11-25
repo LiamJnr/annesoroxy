@@ -1,3 +1,29 @@
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.checkout-spinner-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--purple-deep);
+}
+
+.button-spinner-wrap {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 0.45rem;
+}
+
 .checkout-panel { grid-area: checkout; display: none; max-width: 480px; padding: 1.1rem; border: 1px solid var(--purple); background: var(--purple-pale); }
 .checkout-panel.is-open { display: block; animation: reveal 0.26s ease both; }
 .checkout-panel__header { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
@@ -7,7 +33,7 @@
 .checkout-panel__close:focus-visible { color: var(--ink); outline: 1px solid var(--purple-deep); outline-offset: 2px; }
 .checkout-panel h2 { margin: 1.35rem 0 0.85rem; font-family: "Instrument Serif", Georgia, serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; letter-spacing: -0.04em; line-height: 0.9; }
 .checkout-slot { min-height: 4rem; border: 1px dashed rgba(53, 20, 118, 0.48); color: var(--purple-deep); }
-.checkout-status { display: grid; min-height: 4rem; place-items: center; margin: 0; padding: 0.8rem; font-size: 0.58rem; letter-spacing: 0.11em; text-align: center; }
+.checkout-status { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; min-height: 5.5rem; margin: 0; padding: 1rem; font-size: 0.65rem; letter-spacing: 0.08em; text-align: center; }
 .checkout-status.is-error { color: #8b1d3f; }
 .checkout-form { padding: 1rem; background: rgba(244, 240, 232, 0.72); }
 .checkout-submit { display: flex; justify-content: center; align-items: center; width: 100%; margin-top: 1rem; padding: 0.83rem 1.2rem; border: 1px solid var(--purple-deep); border-radius: 100vh; color: var(--paper); background: var(--purple-deep); cursor: pointer; font-family: inherit; font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; transition: background 0.18s ease, color 0.18s ease; }

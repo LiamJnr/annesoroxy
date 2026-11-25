@@ -136,7 +136,11 @@ if (customSubmit) {
     const label = selectedAddOns.length
       ? `Request custom content — ${selectedAddOns.join(" + ")}`
       : "Request custom content";
-    checkout.select("custom", label, { priority: isPriority, premadeAccess: includesPremadeAccess });
+    checkout.select("custom", label, {
+      priority: isPriority,
+      premadeAccess: includesPremadeAccess,
+      triggerButton: customSubmit,
+    });
   });
 }
 
@@ -173,6 +177,7 @@ if (tipSubmit) {
   tipSubmit.addEventListener("click", () => {
     checkout.select("tip", `Leave a little something ($${selectedTipAmount})`, {
       amount: selectedTipAmount * 100,
+      triggerButton: tipSubmit,
     });
   });
 }
