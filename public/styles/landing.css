@@ -289,7 +289,6 @@ h1 em { color: var(--purple); }
   width: calc((100% - 0.5rem) / 5);
   border-radius: 100vh;
   background: var(--purple-deep);
-  box-shadow: 0 1px 3px rgba(15, 6, 35, 0.16);
   transition: transform 0.28s cubic-bezier(0.2, 0.85, 0.32, 1.05);
   pointer-events: none;
   z-index: 0;

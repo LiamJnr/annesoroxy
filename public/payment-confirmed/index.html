@@ -4,25 +4,89 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <title>Roxy — Confirming payment</title>
+    <title>Roxy — Payment Confirmed</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20261124-2" />
+    <link rel="stylesheet" href="styles.css?v=20261124-5" />
   </head>
   <body>
     <main class="confirmation">
-      <p class="eyebrow">ROXY / SECURE CONFIRMATION</p>
-      <div class="mark" aria-hidden="true">✓</div>
+      <p class="eyebrow" id="confirmation-eyebrow">ROXY / PRIVATE ACCESS</p>
+      <div class="mark" id="confirmation-mark" aria-hidden="true">✓</div>
       <h1 id="confirmation-title">Confirming your payment.</h1>
-      <p id="confirmation-message" class="message" aria-live="polite">Please keep this page open while we verify it securely.</p>
-      <section id="receipt-panel" class="receipt-panel" hidden aria-label="Pre-made access receipt">
-        <p>Pre-made access is included with your request.</p>
-        <a id="receipt-download" href="#" download>Download your receipt <span aria-hidden="true">↓</span></a>
-        <p class="receipt-panel__instruction">Send the receipt to Snapchat <strong>@annesoroxy</strong> for confirmation.</p>
+      <p id="confirmation-message" class="message" aria-live="polite">Please keep this page open while we verify your transaction.</p>
+
+      <!-- Snapchat instruction & action banner -->
+      <section id="snapchat-panel" class="snapchat-banner" hidden aria-label="Snapchat Instructions">
+        <div class="snapchat-banner__content">
+          <p class="snapchat-banner__tag">ACTION REQUIRED</p>
+          <p class="snapchat-banner__text">Screenshot your receipt below and send it to Snapchat <strong>@annesoroxy</strong> to begin your request.</p>
+        </div>
+        <div class="snapchat-banner__actions">
+          <button type="button" class="action-pill" id="copy-ref-button">Copy Reference</button>
+          <a class="action-pill" href="https://snapchat.com/add/annesoroxy" target="_blank" rel="noopener noreferrer">Open Snapchat</a>
+        </div>
       </section>
-      <a id="home-link" href="/" hidden>Return home <span aria-hidden="true">↗</span></a>
+
+      <!-- Luxury Security Receipt Card -->
+      <section id="receipt-card" class="receipt-card" hidden aria-label="Official Transaction Receipt">
+        <div class="receipt-card__header">
+          <div>
+            <p class="receipt-card__brand">ROXY / OFFICIAL ACCESS RECEIPT</p>
+            <p class="receipt-card__site">ANNESOROXY.COM</p>
+          </div>
+          <div class="receipt-card__badge">
+            <span class="badge-dot"></span>
+            <span>VERIFIED</span>
+          </div>
+        </div>
+
+        <div class="receipt-card__divider"></div>
+
+        <div class="receipt-card__grid">
+          <div class="receipt-row">
+            <span class="receipt-label">ITEM</span>
+            <span class="receipt-value" id="receipt-item">Custom Content Request</span>
+          </div>
+          <div class="receipt-row" id="receipt-priority-row">
+            <span class="receipt-label">PRIORITY PUSH</span>
+            <span class="receipt-value" id="receipt-priority">Included</span>
+          </div>
+          <div class="receipt-row" id="receipt-premade-row">
+            <span class="receipt-label">PRE-MADE ACCESS</span>
+            <span class="receipt-value" id="receipt-premade">Included</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">AMOUNT PAID</span>
+            <span class="receipt-value receipt-amount" id="receipt-amount">—</span>
+          </div>
+        </div>
+
+        <div class="receipt-card__divider"></div>
+
+        <div class="receipt-card__meta">
+          <div class="receipt-meta-item">
+            <span class="receipt-label">REFERENCE ID</span>
+            <code class="receipt-code" id="receipt-ref">—</code>
+          </div>
+          <div class="receipt-meta-item">
+            <span class="receipt-label">TIMESTAMP</span>
+            <span class="receipt-value" id="receipt-time">—</span>
+          </div>
+        </div>
+
+        <div class="receipt-card__footer">
+          <div class="receipt-barcode" aria-hidden="true"></div>
+          <p class="receipt-fineprint">PAYMENT CONFIRMATION RECEIPT · ANNESOROXY.COM</p>
+        </div>
+      </section>
+
+      <div class="confirmation-actions">
+        <a id="receipt-download" class="action-pill" href="#" download hidden>Download Receipt Voucher</a>
+        <a id="home-link" class="action-pill secondary" href="/" hidden>Return to Home</a>
+      </div>
     </main>
-    <script type="module" src="scripts/app.js?v=20261124-2"></script>
+    <script type="module" src="scripts/app.js?v=20261124-5"></script>
   </body>
 </html>

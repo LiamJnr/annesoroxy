@@ -18,7 +18,9 @@ export async function onRequestGet({ request, env }) {
   }
 
   const reservation = await env.PAYMENTS_DB.prepare(
-    "SELECT status, premade_access FROM checkout_reservations WHERE id = ?",
+    `SELECT id, status, payment_type, amount_cents, currency, priority, premade_access, paid_at
+       FROM checkout_reservations
+      WHERE id = ?`,
   )
     .bind(reservationId)
     .first();
@@ -28,7 +30,13 @@ export async function onRequestGet({ request, env }) {
   }
 
   return json({
+    id: reservation.id,
     status: reservation.status,
-    premadeAccess: reservation.status === "paid" && reservation.premade_access === 1,
+    paymentType: reservation.payment_type,
+    amountCents: reservation.amount_cents,
+    currency: reservation.currency,
+    priority: reservation.priority === 1,
+    premadeAccess: reservation.premade_access === 1,
+    paidAt: reservation.paid_at,
   });
 }
