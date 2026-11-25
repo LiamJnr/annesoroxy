@@ -32,7 +32,7 @@
 .checkout-panel__close:hover,
 .checkout-panel__close:focus-visible { color: var(--ink); outline: 1px solid var(--purple-deep); outline-offset: 2px; }
 .checkout-panel h2 { margin: 1.35rem 0 0.85rem; font-family: "Instrument Serif", Georgia, serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; letter-spacing: -0.04em; line-height: 0.9; }
-.checkout-slot { min-height: 4rem; border: 1px dashed rgba(53, 20, 118, 0.48); color: var(--purple-deep); }
+.checkout-slot { color: var(--purple-deep); }
 .checkout-status { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; min-height: 5.5rem; margin: 0; padding: 1rem; font-size: 0.65rem; letter-spacing: 0.08em; text-align: center; }
 .checkout-status.is-error { color: #8b1d3f; }
 .checkout-form { padding: 1rem; background: rgba(244, 240, 232, 0.72); }
