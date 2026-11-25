@@ -1,13 +1,13 @@
-import { fetchPaymentStatus } from "./payment-status.js?v=20261124-5";
+import { fetchPaymentStatus } from "./payment-status.js?v=20261124-6";
 
 const title = document.querySelector("#confirmation-title");
 const message = document.querySelector("#confirmation-message");
 const mark = document.querySelector("#confirmation-mark");
 const homeLink = document.querySelector("#home-link");
-const snapchatPanel = document.querySelector("#snapchat-panel");
+const receiptPrompt = document.querySelector("#receipt-prompt");
 const receiptCard = document.querySelector("#receipt-card");
-const receiptDownload = document.querySelector("#receipt-download");
-const copyRefButton = document.querySelector("#copy-ref-button");
+const receiptReveal = document.querySelector("#receipt-reveal");
+const snapchatLink = document.querySelector("#snapchat-link");
 
 const receiptItem = document.querySelector("#receipt-item");
 const receiptPriorityRow = document.querySelector("#receipt-priority-row");
@@ -21,6 +21,7 @@ const receiptTime = document.querySelector("#receipt-time");
 const reservationId = new URLSearchParams(window.location.search).get("reservation_id");
 const maximumChecks = 45;
 let checks = 0;
+let confirmedCustomPayment;
 
 function formatCurrency(cents, currency = "USD") {
   return new Intl.NumberFormat("en-US", {
@@ -69,51 +70,15 @@ function renderReceipt(payment) {
   if (receiptTime) receiptTime.textContent = formattedTime;
 
   receiptCard.hidden = false;
-  if (snapchatPanel) snapchatPanel.hidden = false;
-
-  if (receiptDownload) {
-    receiptDownload.href = `/api/premade-access-receipt?reservation_id=${encodeURIComponent(payment.id)}`;
-    receiptDownload.hidden = false;
-  }
 }
 
-if (copyRefButton && reservationId) {
-  copyRefButton.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText(reservationId);
-      const originalText = copyRefButton.textContent;
-      copyRefButton.textContent = "Copied!";
-      setTimeout(() => {
-        copyRefButton.textContent = originalText;
-      }, 2000);
-    } catch {
-      copyRefButton.textContent = "Reference: " + reservationId.slice(0, 8);
-    }
-  });
-}
-
-if (receiptDownload) {
-  receiptDownload.addEventListener("click", async (event) => {
-    event.preventDefault();
-    if (!receiptDownload.href || receiptDownload.dataset.downloading === "true") return;
-
-    receiptDownload.dataset.downloading = "true";
-    try {
-      const response = await fetch(receiptDownload.href, { cache: "no-store" });
-      if (!response.ok) throw new Error("Receipt unavailable.");
-
-      const blob = await response.blob();
-      const downloadUrl = URL.createObjectURL(blob);
-      const download = document.createElement("a");
-      download.href = downloadUrl;
-      download.download = `roxy-receipt-${reservationId}.html`;
-      download.click();
-      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
-    } catch {
-      message.textContent = "Your receipt is temporarily unavailable. Please screenshot the card above.";
-    } finally {
-      delete receiptDownload.dataset.downloading;
-    }
+if (receiptReveal) {
+  receiptReveal.addEventListener("click", () => {
+    if (!confirmedCustomPayment) return;
+    renderReceipt(confirmedCustomPayment);
+    receiptPrompt.hidden = true;
+    snapchatLink.hidden = false;
+    homeLink.hidden = false;
   });
 }
 
@@ -130,13 +95,15 @@ async function checkPaymentStatus() {
       if (payment.paymentType === "tip") {
         showFinal("Thank you for the support.", "Your contribution has been received. I truly appreciate you.", true);
         if (receiptCard) receiptCard.hidden = true;
-        if (snapchatPanel) snapchatPanel.hidden = true;
-        if (receiptDownload) receiptDownload.hidden = true;
+        if (receiptPrompt) receiptPrompt.hidden = true;
+        if (snapchatLink) snapchatLink.hidden = true;
         return;
       }
 
-      showFinal("Request confirmed.", "Your payment was verified. Review your official receipt below.", true);
-      renderReceipt(payment);
+      title.textContent = "Request confirmed.";
+      message.textContent = "Your payment was verified. Open your receipt to continue.";
+      confirmedCustomPayment = payment;
+      receiptPrompt.hidden = false;
       return;
     }
 

@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20261124-5" />
+    <link rel="stylesheet" href="styles.css?v=20261124-6" />
   </head>
   <body>
     <main class="confirmation">
@@ -17,16 +17,12 @@
       <h1 id="confirmation-title">Confirming your payment.</h1>
       <p id="confirmation-message" class="message" aria-live="polite">Please keep this page open while we verify your transaction.</p>
 
-      <!-- Snapchat instruction & action banner -->
-      <section id="snapchat-panel" class="snapchat-banner" hidden aria-label="Snapchat Instructions">
-        <div class="snapchat-banner__content">
+      <section id="receipt-prompt" class="snapchat-banner" hidden aria-label="Receipt action required">
+        <div>
           <p class="snapchat-banner__tag">ACTION REQUIRED</p>
-          <p class="snapchat-banner__text">Screenshot your receipt below and send it to Snapchat <strong>@annesoroxy</strong> to begin your request.</p>
+          <p class="snapchat-banner__text">Open your receipt, screenshot it, then send it to Snapchat <strong>@annesoroxy</strong> to begin your request.</p>
         </div>
-        <div class="snapchat-banner__actions">
-          <button type="button" class="action-pill" id="copy-ref-button">Copy Reference</button>
-          <a class="action-pill" href="https://snapchat.com/add/annesoroxy" target="_blank" rel="noopener noreferrer">Open Snapchat</a>
-        </div>
+        <button type="button" class="action-pill" id="receipt-reveal">View Receipt</button>
       </section>
 
       <!-- Luxury Security Receipt Card -->
@@ -83,10 +79,10 @@
       </section>
 
       <div class="confirmation-actions">
-        <a id="receipt-download" class="action-pill" href="#" download hidden>Download Receipt Voucher</a>
+        <a id="snapchat-link" class="action-pill" href="https://snapchat.com/add/annesoroxy" target="_blank" rel="noopener noreferrer" hidden>Open Snapchat</a>
         <a id="home-link" class="action-pill secondary" href="/" hidden>Return to Home</a>
       </div>
     </main>
-    <script type="module" src="scripts/app.js?v=20261124-5"></script>
+    <script type="module" src="scripts/app.js?v=20261124-6"></script>
   </body>
 </html>
