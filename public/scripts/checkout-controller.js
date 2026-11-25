@@ -1,5 +1,5 @@
-import { createPaymentIntent } from "./payment-api.js?v=20261124-2";
-import { createStripeClient, loadStripe } from "./stripe-loader.js?v=20261124-2";
+import { createPaymentIntent } from "./payment-api.js?v=20261124-3";
+import { createStripeClient, loadStripe } from "./stripe-loader.js?v=20261124-3";
 
 export function createCheckoutController({ ui, appearance }) {
   let activeCheckout;

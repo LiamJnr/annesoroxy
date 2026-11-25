@@ -6,6 +6,10 @@ body { display: grid; min-width: 320px; min-height: 100svh; margin: 0; color: va
 .mark { display: grid; width: 4.5rem; aspect-ratio: 1; place-items: center; margin: 3rem 0 1.6rem; color: var(--paper); background: var(--purple); font-family: "Instrument Serif", Georgia, serif; font-size: 2.4rem; }
 h1 { max-width: 32rem; margin: 0; font-family: "Instrument Serif", Georgia, serif; font-size: clamp(3.6rem, 10vw, 6.5rem); font-weight: 400; letter-spacing: -0.065em; line-height: 0.85; }
 .message { max-width: 28rem; margin: 1.7rem 0 0; color: rgba(16, 16, 15, 0.68); font-size: 0.73rem; line-height: 1.7; }
+.receipt-panel { width: min(27rem, 100%); margin-top: 1.5rem; padding: 1rem; border: 1px solid var(--purple); background: var(--purple-pale); }
+.receipt-panel p { margin: 0; color: var(--purple-deep); font-size: 0.67rem; line-height: 1.6; }
+.receipt-panel a { margin-top: 0.9rem; }
+.receipt-panel__instruction { margin-top: 0.9rem !important; }
 a { display: flex; justify-content: space-between; width: min(21rem, 100%); margin-top: 2rem; padding: 0.95rem; border: 1px solid var(--purple-deep); color: var(--paper); background: var(--purple-deep); font-size: 0.65rem; letter-spacing: 0.09em; text-decoration: none; text-transform: uppercase; }
 a:hover,
 a:focus-visible { color: var(--purple-deep); background: transparent; outline: 0; }

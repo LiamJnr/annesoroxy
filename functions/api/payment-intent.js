@@ -1,5 +1,5 @@
 const HANDYPAY_PAYMENT_INTENTS_URL = "https://api.handypay.me/api/v1/payment-intents";
-const VALID_PAYMENT_TYPES = new Set(["custom", "premade", "tip"]);
+const VALID_PAYMENT_TYPES = new Set(["custom", "tip"]);
 
 function json(body, status = 200) {
   return Response.json(body, {
@@ -67,15 +67,17 @@ export async function onRequestPost(context) {
 
   const ALLOWED_TIP_AMOUNTS = new Set([1500, 2500, 5000, 7500, 10000]);
   const isPriority = paymentType === "custom" && payload?.priority === true;
+  const includesPremadeAccess = paymentType === "custom" && payload?.premadeAccess === true;
   let finalAmount = offering.amount_cents;
   let finalLabel = offering.label;
 
   if (paymentType === "tip" && payload?.amount && ALLOWED_TIP_AMOUNTS.has(Number(payload.amount))) {
     finalAmount = Number(payload.amount);
     finalLabel = `Supporter tip ($${finalAmount / 100})`;
-  } else if (isPriority) {
-    finalAmount = offering.amount_cents + 1000;
-    finalLabel = `${offering.label} (Priority Rush)`;
+  } else if (paymentType === "custom") {
+    finalAmount += (isPriority ? 1699 : 0) + (includesPremadeAccess ? 1000 : 0);
+    const addOns = [isPriority && "Priority push", includesPremadeAccess && "Pre-made access"].filter(Boolean);
+    if (addOns.length) finalLabel = `${offering.label} (${addOns.join(" + ")})`;
   }
 
   const reservationId = crypto.randomUUID();
@@ -83,10 +85,10 @@ export async function onRequestPost(context) {
 
   await env.PAYMENTS_DB.prepare(
     `INSERT INTO checkout_reservations
-      (id, payment_type, amount_cents, currency, priority, status, created_at)
-     VALUES (?, ?, ?, ?, ?, 'pending', ?)`,
+      (id, payment_type, amount_cents, currency, priority, premade_access, status, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
   )
-    .bind(reservationId, offering.payment_type, finalAmount, offering.currency, Number(isPriority), createdAt)
+    .bind(reservationId, offering.payment_type, finalAmount, offering.currency, Number(isPriority), Number(includesPremadeAccess), createdAt)
     .run();
 
   let handypayResponse;
@@ -106,6 +108,7 @@ export async function onRequestPost(context) {
           reservation_id: reservationId,
           payment_type: offering.payment_type,
           priority: String(isPriority),
+          premade_access: String(includesPremadeAccess),
         },
       }),
     });

@@ -18,7 +18,7 @@ export async function onRequestGet({ request, env }) {
   }
 
   const reservation = await env.PAYMENTS_DB.prepare(
-    "SELECT status FROM checkout_reservations WHERE id = ?",
+    "SELECT status, premade_access FROM checkout_reservations WHERE id = ?",
   )
     .bind(reservationId)
     .first();
@@ -27,5 +27,8 @@ export async function onRequestGet({ request, env }) {
     return json({ error: "Payment reference not found." }, 404);
   }
 
-  return json({ status: reservation.status });
+  return json({
+    status: reservation.status,
+    premadeAccess: reservation.status === "paid" && reservation.premade_access === 1,
+  });
 }

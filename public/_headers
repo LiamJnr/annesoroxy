@@ -9,3 +9,6 @@
 
 /scripts/*
   Cache-Control: no-store
+
+/payment-confirmed/*
+  Cache-Control: no-store

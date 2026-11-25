@@ -8,5 +8,5 @@ export async function fetchPaymentStatus(reservationId) {
     throw new Error(payload.error || "Payment reference not found.");
   }
 
-  return payload.status;
+  return payload;
 }

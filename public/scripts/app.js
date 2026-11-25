@@ -1,6 +1,6 @@
-import { createCheckoutController } from "./checkout-controller.js?v=20261124-2";
-import { paymentOptions, stripeAppearance } from "./config.js?v=20261124-2";
-import { createCheckoutUi } from "./checkout-ui.js?v=20261124-2";
+import { createCheckoutController } from "./checkout-controller.js?v=20261124-3";
+import { paymentOptions, stripeAppearance } from "./config.js?v=20261124-3";
+import { createCheckoutUi } from "./checkout-ui.js?v=20261124-3";
 
 const ui = createCheckoutUi();
 const checkout = createCheckoutController({ ui, appearance: stripeAppearance });
@@ -9,14 +9,17 @@ const customToggle = document.querySelector("#custom-toggle");
 const customTray = document.querySelector("#custom-tray");
 const customSubmit = document.querySelector("#custom-submit");
 const queueNumberEl = document.querySelector("#queue-number");
-const priorityPills = document.querySelectorAll(".priority-pill");
+const customAddOns = document.querySelectorAll("[data-custom-addon]");
+const actionCards = document.querySelectorAll(".action-card");
 
 const tipToggle = document.querySelector("#tip-toggle");
 const tipTray = document.querySelector("#tip-tray");
 const tipPills = document.querySelectorAll(".tip-pill");
+const tipThumb = document.querySelector(".tip-segmented__thumb");
 const tipSubmit = document.querySelector("#tip-submit");
 
 let isPriority = false;
+let includesPremadeAccess = false;
 let selectedTipAmount = 25;
 
 function getQueuePositions() {
@@ -48,21 +51,37 @@ function renderQueueStatus() {
   queueNumberEl.textContent = `#${currentNumber}`;
 }
 
+function renderCustomSubmit() {
+  if (!customSubmit) return;
+  const addOnTotal = (isPriority ? 16.99 : 0) + (includesPremadeAccess ? 10 : 0);
+  customSubmit.textContent = addOnTotal
+    ? `Continue with request (+$${addOnTotal.toFixed(2)})`
+    : "Continue with request";
+}
+
+function selectActionCard(card) {
+  actionCards.forEach((actionCard) => {
+    const isSelected = actionCard === card;
+    actionCard.classList.toggle("is-selected", isSelected);
+    actionCard.setAttribute("aria-checked", String(isSelected));
+    actionCard.closest(".support-card")?.classList.toggle("is-selected", isSelected);
+  });
+}
+
 function closeCustomTray() {
   if (!customTray || !customToggle) return;
   customTray.hidden = true;
   customToggle.setAttribute("aria-expanded", "false");
 }
 
-function toggleCustomTray() {
+function openCustomTray() {
   if (!customTray || !customToggle) return;
-  const isOpening = customTray.hidden;
-  if (isOpening) {
+  if (customTray.hidden) {
     closeTipTray();
     renderQueueStatus();
   }
-  customTray.hidden = !isOpening;
-  customToggle.setAttribute("aria-expanded", String(isOpening));
+  customTray.hidden = false;
+  customToggle.setAttribute("aria-expanded", "true");
 }
 
 function closeTipTray() {
@@ -71,57 +90,64 @@ function closeTipTray() {
   tipToggle.setAttribute("aria-expanded", "false");
 }
 
-function toggleTipTray() {
+function syncTipThumb() {
+  if (!tipThumb) return;
+  const activeIndex = Array.from(tipPills).findIndex((p) => p.classList.contains("is-selected"));
+  if (activeIndex >= 0) {
+    tipThumb.style.transform = `translateX(${activeIndex * 100}%)`;
+  }
+}
+
+function openTipTray() {
   if (!tipTray || !tipToggle) return;
-  const isOpening = tipTray.hidden;
-  if (isOpening) {
+  if (tipTray.hidden) {
     closeCustomTray();
   }
-  tipTray.hidden = !isOpening;
-  tipToggle.setAttribute("aria-expanded", String(isOpening));
+  tipTray.hidden = false;
+  tipToggle.setAttribute("aria-expanded", "true");
+  syncTipThumb();
 }
 
 if (customToggle) {
   customToggle.addEventListener("click", () => {
-    toggleCustomTray();
+    selectActionCard(customToggle);
+    openCustomTray();
   });
 }
 
-priorityPills.forEach((pill) => {
-  pill.addEventListener("click", () => {
-    priorityPills.forEach((p) => {
-      p.classList.remove("is-selected");
-      p.setAttribute("aria-checked", "false");
-    });
-    pill.classList.add("is-selected");
-    pill.setAttribute("aria-checked", "true");
-    isPriority = pill.dataset.priority === "true";
+customAddOns.forEach((addOn) => {
+  addOn.addEventListener("click", () => {
+    const isSelected = !addOn.classList.contains("is-selected");
+    addOn.classList.toggle("is-selected", isSelected);
+    addOn.setAttribute("aria-checked", String(isSelected));
+    isPriority = document.querySelector('[data-custom-addon="priority"]')?.classList.contains("is-selected") ?? false;
+    includesPremadeAccess = document.querySelector('[data-custom-addon="premade-access"]')?.classList.contains("is-selected") ?? false;
     renderQueueStatus();
-
-    if (customSubmit) {
-      customSubmit.innerHTML = isPriority
-        ? "<span>Continue with Priority (+$10)</span>"
-        : "<span>Continue with Standard Queue</span>";
-    }
+    renderCustomSubmit();
   });
 });
 
 if (customSubmit) {
   customSubmit.addEventListener("click", () => {
-    const label = isPriority
-      ? "Request custom content (Priority Rush)"
+    const selectedAddOns = [
+      isPriority && "Priority push",
+      includesPremadeAccess && "Pre-made access",
+    ].filter(Boolean);
+    const label = selectedAddOns.length
+      ? `Request custom content — ${selectedAddOns.join(" + ")}`
       : "Request custom content";
-    checkout.select("custom", label, { priority: isPriority });
+    checkout.select("custom", label, { priority: isPriority, premadeAccess: includesPremadeAccess });
   });
 }
 
 if (tipToggle) {
   tipToggle.addEventListener("click", () => {
-    toggleTipTray();
+    selectActionCard(tipToggle);
+    openTipTray();
   });
 }
 
-tipPills.forEach((pill) => {
+tipPills.forEach((pill, index) => {
   pill.addEventListener("click", () => {
     tipPills.forEach((p) => {
       p.classList.remove("is-selected");
@@ -131,11 +157,17 @@ tipPills.forEach((pill) => {
     pill.setAttribute("aria-checked", "true");
     selectedTipAmount = Number(pill.dataset.amount);
 
+    if (tipThumb) {
+      tipThumb.style.transform = `translateX(${index * 100}%)`;
+    }
+
     if (tipSubmit) {
       tipSubmit.innerHTML = `<span>Continue with $${selectedTipAmount}</span>`;
     }
   });
 });
+
+syncTipThumb();
 
 if (tipSubmit) {
   tipSubmit.addEventListener("click", () => {
@@ -147,6 +179,7 @@ if (tipSubmit) {
 
 document.querySelectorAll("[data-payment-type]").forEach((button) => {
   button.addEventListener("click", () => {
+    selectActionCard(button);
     closeTipTray();
     closeCustomTray();
     const paymentType = button.dataset.paymentType;
