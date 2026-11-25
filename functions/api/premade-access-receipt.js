@@ -45,7 +45,6 @@ body{margin:0;padding:2rem 1rem;background:#faf8f5;color:#10100f;font-family:ui-
       <p class="brand">ROXY / OFFICIAL TRANSACTION VOUCHER</p>
       <p class="site">ANNESOROXY.COM</p>
     </div>
-    <div class="badge"><span class="dot"></span>VERIFIED PAYMENT</div>
   </div>
   <div class="divider"></div>
   <div class="grid">

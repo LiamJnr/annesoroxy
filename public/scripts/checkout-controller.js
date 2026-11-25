@@ -1,6 +1,6 @@
 import { createPaymentIntent } from "./payment-api.js?v=20261124-3";
 import { createStripeClient, loadStripe } from "./stripe-loader.js?v=20261124-3";
-import { SPINNER_SVG } from "./checkout-ui.js?v=20261124-4";
+import { SPINNER_SVG } from "./checkout-ui.js?v=20261124-5";
 
 export function createCheckoutController({ ui, appearance }) {
   let activeCheckout;

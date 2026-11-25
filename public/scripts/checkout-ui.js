@@ -10,6 +10,7 @@ export function createCheckoutUi() {
   const submitButton = document.querySelector(".checkout-submit");
 
   let statusEl = null;
+  let currentSubmitLabel = "Unlock Access";
 
   function getOrCreateStatus() {
     if (!statusEl && slot) {
@@ -65,7 +66,17 @@ export function createCheckoutUi() {
     hideForm() {
       form.hidden = true;
     },
-    setSubmitLabel(text) { submitButton.textContent = text; },
-    setSubmitting(isSubmitting) { submitButton.disabled = isSubmitting; },
+    setSubmitLabel(text) {
+      currentSubmitLabel = text;
+      submitButton.textContent = text;
+    },
+    setSubmitting(isSubmitting) {
+      submitButton.disabled = isSubmitting;
+      if (isSubmitting) {
+        submitButton.innerHTML = `<span class="button-spinner-wrap">${SPINNER_SVG}</span><span>Processing…</span>`;
+      } else {
+        submitButton.textContent = currentSubmitLabel;
+      }
+    },
   };
 }
