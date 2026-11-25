@@ -25,6 +25,7 @@ export function createCheckoutUi() {
     setAvailability,
     showForm() { form.hidden = false; },
     hideForm() { form.hidden = true; },
+    setSubmitLabel(text) { submitButton.textContent = text; },
     setSubmitting(isSubmitting) { submitButton.disabled = isSubmitting; },
   };
 }

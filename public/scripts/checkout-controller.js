@@ -22,9 +22,10 @@ export function createCheckoutController({ ui, appearance }) {
     const currentAttempt = ++attempt;
     isPreparing = true;
     ui.setPanelTitle(label);
+    ui.setSubmitLabel(paymentType === "tip" ? "Send Support" : "Unlock Access");
     ui.openPanel();
     clearMountedCheckout();
-    ui.setStatus("Preparing secure checkout…");
+    ui.setStatus("Preparing checkout…");
     ui.setAvailability("Preparing your selected checkout.");
 
     try {
@@ -45,7 +46,7 @@ export function createCheckoutController({ ui, appearance }) {
       mountedPaymentElement = paymentElement;
       activeCheckout = { stripe, elements, reservationId: checkout.reservationId };
       ui.showForm();
-      ui.setStatus("Secure checkout is ready.");
+      ui.setStatus("Ready.");
       ui.setAvailability("Secure checkout is ready below.");
     } catch (error) {
       if (currentAttempt !== attempt) return;
@@ -70,7 +71,7 @@ export function createCheckoutController({ ui, appearance }) {
 
     isSubmitting = true;
     ui.setSubmitting(true);
-    ui.setStatus("Submitting secure payment…");
+    ui.setStatus("Authorizing…");
 
     try {
       const validation = await activeCheckout.elements.submit();
