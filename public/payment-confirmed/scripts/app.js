@@ -21,6 +21,7 @@ const receiptTime = document.querySelector("#receipt-time");
 const receiptAuth = document.querySelector("#receipt-auth");
 
 const reservationId = new URLSearchParams(window.location.search).get("reservation_id");
+const paymentRequestToken = new URLSearchParams(window.location.search).get("payment_request");
 const maximumChecks = 45;
 let checks = 0;
 let confirmedCustomPayment;
@@ -173,4 +174,26 @@ async function checkPaymentStatus() {
   }
 }
 
-checkPaymentStatus();
+async function checkPrivateRequestStatus() {
+  try {
+    const response = await fetch(`/api/payment-request/${encodeURIComponent(paymentRequestToken)}`, { cache: "no-store" });
+    const payload = await response.json();
+    if (!response.ok) throw new Error(payload.error);
+    if (payload.request.status === "paid") {
+      showFinal("Payment confirmed.", "Your arranged request has been paid. Thank you.", true);
+      return;
+    }
+    if (payload.request.status === "failed" || payload.request.status === "expired") {
+      showFinal("Payment wasn’t completed.", "No confirmed payment was received. Please contact Roxy if you need a new link.", false);
+      return;
+    }
+    checks += 1;
+    if (checks >= maximumChecks) return showFinal("Still confirming…", "Your payment may still complete shortly. Please refresh this page in a moment.", false);
+    window.setTimeout(checkPrivateRequestStatus, 2000);
+  } catch {
+    showFinal("Confirmation is temporarily unavailable.", "Please check back shortly.", false);
+  }
+}
+
+if (paymentRequestToken) checkPrivateRequestStatus();
+else checkPaymentStatus();

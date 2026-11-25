@@ -36,6 +36,9 @@ CREATE TABLE IF NOT EXISTS payment_requests (
   currency TEXT NOT NULL CHECK (length(currency) = 3),
   status TEXT NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'checkout_ready', 'paid', 'failed', 'cancelled', 'expired')),
   handypay_intent_id TEXT UNIQUE,
+  client_secret TEXT,
+  publishable_key TEXT,
+  stripe_account TEXT,
   created_at INTEGER NOT NULL,
   expires_at INTEGER,
   paid_at INTEGER

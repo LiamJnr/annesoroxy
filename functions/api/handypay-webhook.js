@@ -81,6 +81,7 @@ export async function onRequestPost({ request, env }) {
           WHERE handypay_intent_id = ?`,
       ).bind(receivedAt, intentId),
     );
+    statements.push(env.PAYMENTS_DB.prepare(`UPDATE payment_requests SET status = 'paid', paid_at = COALESCE(paid_at, ?) WHERE handypay_intent_id = ?`).bind(receivedAt, intentId));
   }
 
   if (event.type === "payment_intent.payment_failed" && typeof intentId === "string") {
@@ -92,6 +93,7 @@ export async function onRequestPost({ request, env }) {
             AND status IN ('pending', 'checkout_ready')`,
       ).bind(intentId),
     );
+    statements.push(env.PAYMENTS_DB.prepare(`UPDATE payment_requests SET status = 'failed' WHERE handypay_intent_id = ? AND status = 'checkout_ready'`).bind(intentId));
   }
 
   await env.PAYMENTS_DB.batch(statements);
