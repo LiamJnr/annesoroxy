@@ -199,7 +199,7 @@ tipPills.forEach((pill, index) => {
   pill.addEventListener("click", () => {
     isCustomTip = false;
     if (tipCustomField) tipCustomField.hidden = true;
-    if (tipCustomToggle) tipCustomToggle.textContent = "Or enter custom amount";
+    if (tipCustomToggle) tipCustomToggle.textContent = "Or choose your own amount";
     if (tipCustomInput) tipCustomInput.value = "";
     if (tipCustomHint) {
       tipCustomHint.textContent = "Min $5 · Max $1,000";

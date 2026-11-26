@@ -110,7 +110,7 @@ if (receiptReveal) {
     if (receiptPrompt) receiptPrompt.hidden = true;
     if (eyebrow) eyebrow.textContent = "ROXY / OFFICIAL RECEIPT";
     if (title) title.textContent = "Your Receipt";
-    if (message) message.textContent = "Screenshot this receipt and send it to Snapchat @annesoroxy to begin your request.";
+    if (message) message.textContent = "Screenshot this receipt and send it to me on Snapchat @annesoroxy so we can get started.";
     if (snapchatLink) snapchatLink.hidden = false;
     if (homeLink) homeLink.hidden = false;
 
@@ -134,7 +134,7 @@ async function checkPaymentStatus() {
       }
 
       if (payment.paymentType === "tip") {
-        showFinal("Thank you for the support.", "Your contribution has been received. I truly appreciate you.", true);
+        showFinal("Thank you for the love.", "I got your tip. Thank you for spoiling me, it means the world to me.", true);
         if (receiptCard) receiptCard.hidden = true;
         if (receiptPrompt) receiptPrompt.hidden = true;
         if (snapchatLink) snapchatLink.hidden = true;
@@ -142,8 +142,8 @@ async function checkPaymentStatus() {
         return;
       }
 
-      title.textContent = "Request confirmed.";
-      message.textContent = "Your payment was verified. Download your receipt to continue.";
+      title.textContent = "You’re in.";
+      message.textContent = "Your spot is locked in. Grab your receipt below to connect on Snapchat.";
       confirmedCustomPayment = payment;
       if (receiptPrompt) receiptPrompt.hidden = false;
       if (receiptCard) receiptCard.hidden = true;
@@ -153,7 +153,7 @@ async function checkPaymentStatus() {
     }
 
     if (payment.status === "failed") {
-      showFinal("Payment wasn’t completed.", "No confirmed payment was received. You can try again whenever you’re ready.", false);
+      showFinal("Payment didn’t go through.", "Your card wasn't charged, so you can try again whenever you're ready.", false);
       return;
     }
 

@@ -31,10 +31,10 @@ export function createCheckoutController({ ui, appearance }) {
     }
 
     ui.setPanelTitle(label);
-    ui.setSubmitLabel(paymentType === "tip" ? "Send Support" : "Unlock Access");
+    ui.setSubmitLabel(paymentType === "tip" ? "Send Love" : "Lock In My Spot");
     ui.openPanel();
     clearMountedCheckout();
-    ui.setLoading("Preparing checkout…");
+    ui.setLoading("Getting things ready for you…");
 
     try {
       const checkout = await createPaymentIntent(paymentType, apiOptions);
@@ -80,12 +80,12 @@ export function createCheckoutController({ ui, appearance }) {
 
     isSubmitting = true;
     ui.setSubmitting(true);
-    ui.setLoading("Authorizing…");
+    ui.setLoading("Securing your spot…");
 
     try {
       const validation = await activeCheckout.elements.submit();
       if (validation.error) {
-        ui.setStatus(validation.error.message || "Please review your payment details.", true);
+        ui.setStatus(validation.error.message || "Aww double-check your card details and try again.", true);
         return;
       }
 

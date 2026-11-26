@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20261126-2" />
+    <link rel="stylesheet" href="styles.css?v=20261126-3" />
   </head>
   <body>
     <main class="landing">
@@ -31,16 +31,16 @@
           <div class="support-card" id="custom-card">
             <button class="action-card" type="button" role="radio" aria-checked="false" id="custom-toggle" aria-expanded="false" aria-controls="custom-tray">
               <span class="action-card__label">Request custom content</span>
-              <span class="action-card__detail">Join the current queue</span>
+              <span class="action-card__detail">Get on my list</span>
             </button>
             <div class="custom-tray" id="custom-tray" hidden aria-label="Custom content queue">
               <div class="queue-status">
                 <span class="queue-status__dot" aria-hidden="true"></span>
-                <p class="queue-status__text">You are currently <strong id="queue-number">#14</strong> in queue for custom content.</p>
+                <p class="queue-status__text">You’re currently <strong id="queue-number">#14</strong> on my custom list.</p>
               </div>
               <div class="add-on-options" aria-label="Optional custom content add-ons">
                 <button class="add-on-option" type="button" role="checkbox" aria-checked="false" data-custom-addon="priority">
-                  <span class="add-on-option__copy"><span>Priority push</span><small>Move ahead in the queue</small></span>
+                  <span class="add-on-option__copy"><span>Priority push</span><small>Skip ahead to the front of my queue</small></span>
                   <strong>+$16.99</strong>
                 </button>
                 <button class="add-on-option" type="button" role="checkbox" aria-checked="false" data-custom-addon="premade-access">
@@ -57,7 +57,7 @@
           <div class="support-card" id="tip-card">
             <button class="action-card" type="button" role="radio" aria-checked="false" id="tip-toggle" aria-expanded="false" aria-controls="tip-tray">
               <span class="action-card__label">Leave a little something</span>
-              <span class="action-card__detail">Support my work</span>
+              <span class="action-card__detail">Spoil me a little</span>
             </button>
             <div class="tip-tray" id="tip-tray" hidden aria-label="Choose tip amount">
               <div class="tip-segmented" role="radiogroup" aria-label="Select tip amount">
@@ -68,7 +68,7 @@
                 <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="75">$75</button>
                 <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="100">$100</button>
               </div>
-              <button type="button" class="tip-custom-toggle" id="tip-custom-toggle">Or enter custom amount</button>
+              <button type="button" class="tip-custom-toggle" id="tip-custom-toggle">Or choose your own amount</button>
               <div class="tip-custom-field" id="tip-custom-field" hidden>
                 <div class="tip-custom-input-wrap">
                   <span class="tip-custom-currency" aria-hidden="true">$</span>
@@ -102,7 +102,7 @@
           <div class="checkout-slot" aria-label="Secure checkout">
             <form class="checkout-form" id="checkout-form" hidden>
               <div id="payment-element"></div>
-              <button class="checkout-submit" type="submit">Unlock Access</button>
+              <button class="checkout-submit" type="submit">Lock In My Spot</button>
             </form>
           </div>
         </aside>
@@ -113,6 +113,6 @@
         <span>ALL RIGHTS RESERVED</span>
       </footer>
     </main>
-    <script type="module" src="scripts/app.js?v=20261126-2"></script>
+    <script type="module" src="scripts/app.js?v=20261126-3"></script>
   </body>
 </html>

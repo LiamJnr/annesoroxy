@@ -10,7 +10,7 @@ export function createCheckoutUi() {
   const submitButton = document.querySelector(".checkout-submit");
 
   let statusEl = null;
-  let currentSubmitLabel = "Unlock Access";
+  let currentSubmitLabel = "Lock In My Spot";
 
   function getOrCreateStatus() {
     if (!statusEl && slot) {
@@ -54,7 +54,7 @@ export function createCheckoutUi() {
       el.textContent = message;
       el.classList.toggle("is-error", isError);
     },
-    setLoading(message = "Preparing checkout…") {
+    setLoading(message = "Getting things ready for you…") {
       const el = getOrCreateStatus();
       el.innerHTML = `<span class="checkout-spinner-wrap">${SPINNER_SVG}</span><span>${message}</span>`;
       el.classList.remove("is-error");
@@ -73,7 +73,7 @@ export function createCheckoutUi() {
     setSubmitting(isSubmitting) {
       submitButton.disabled = isSubmitting;
       if (isSubmitting) {
-        submitButton.innerHTML = `<span class="button-spinner-wrap">${SPINNER_SVG}</span><span>Processing…</span>`;
+        submitButton.innerHTML = `<span class="button-spinner-wrap">${SPINNER_SVG}</span><span>Securing your spot…</span>`;
       } else {
         submitButton.textContent = currentSubmitLabel;
       }
