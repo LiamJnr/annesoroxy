@@ -59,6 +59,6 @@ CREATE TABLE IF NOT EXISTS handypay_webhook_events (
 -- INSERT INTO payment_offerings
 --   (payment_type, label, amount_cents, currency, checkout_limit, active)
 -- VALUES
---   ('custom', 'Custom content', 5000, 'usd', 20, 0),
+--   ('custom', 'Custom content', 500, 'usd', 20, 0),
 --   ('premade', 'Pre-made content', 2500, 'usd', 40, 0),
 --   ('tip', 'Supporter tip', 500, 'usd', 100, 0);

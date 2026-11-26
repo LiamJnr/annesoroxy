@@ -289,7 +289,7 @@ h1 em { color: var(--purple); }
   width: calc((100% - 0.5rem) / 5);
   border-radius: 100vh;
   background: var(--purple-deep);
-  transition: transform 0.28s cubic-bezier(0.2, 0.85, 0.32, 1.05);
+  transition: transform 0.28s cubic-bezier(0.2, 0.85, 0.32, 1.05), opacity 0.2s ease;
   pointer-events: none;
   z-index: 0;
 }
@@ -325,6 +325,106 @@ h1 em { color: var(--purple); }
 .tip-pill.is-selected {
   color: var(--paper);
   font-weight: 500;
+}
+
+.tip-custom-toggle {
+  align-self: center;
+  background: transparent;
+  border: none;
+  padding: 0.15rem 0.5rem;
+  color: var(--purple-deep);
+  font-family: inherit;
+  font-size: 0.63rem;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: color 0.18s ease, opacity 0.18s ease;
+  opacity: 0.82;
+}
+
+.tip-custom-toggle:hover,
+.tip-custom-toggle:focus-visible {
+  opacity: 1;
+  color: var(--purple);
+  outline: 0;
+}
+
+.tip-custom-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  animation: reveal 0.22s ease both;
+}
+
+.tip-custom-field[hidden] {
+  display: none;
+}
+
+.tip-custom-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0 1rem;
+  border: 1px solid var(--line);
+  border-radius: 100vh;
+  background: var(--paper);
+  transition: border-color 0.18s ease, outline-color 0.18s ease;
+}
+
+.tip-custom-input-wrap:focus-within {
+  border-color: var(--purple-deep);
+  outline: 1px solid var(--purple-deep);
+  outline-offset: 2px;
+}
+
+.tip-custom-currency {
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--purple-deep);
+  margin-right: 0.35rem;
+  user-select: none;
+}
+
+.tip-custom-input {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.78rem;
+  padding: 0.4rem 0;
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.tip-custom-input::-webkit-outer-spin-button,
+.tip-custom-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tip-custom-input::placeholder {
+  color: rgba(16, 16, 15, 0.42);
+  font-size: 0.67rem;
+  letter-spacing: 0.02em;
+}
+
+.tip-custom-hint {
+  margin: 0;
+  padding: 0 0.5rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.03em;
+  color: rgba(16, 16, 15, 0.55);
+  text-align: center;
+}
+
+.tip-custom-hint.is-error {
+  color: #8b1d3f;
 }
 
 .tip-submit {

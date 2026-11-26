@@ -1,5 +1,6 @@
 const HANDYPAY_PAYMENT_INTENTS_URL = "https://api.handypay.me/api/v1/payment-intents";
 const VALID_PAYMENT_TYPES = new Set(["custom", "tip"]);
+const CUSTOM_CONTENT_BASE_AMOUNT_CENTS = 500;
 
 function json(body, status = 200) {
   return Response.json(body, {
@@ -34,8 +35,52 @@ export async function onRequestPost(context) {
     return json({ error: "That payment option is unavailable." }, 400);
   }
 
-  // Price, currency, and allocation are intentionally read only from D1.
-  // Never accept an amount or currency from the browser.
+  const offering = await env.PAYMENTS_DB.prepare(
+    `SELECT payment_type, label, amount_cents, currency
+       FROM payment_offerings
+      WHERE payment_type = ?`,
+  )
+    .bind(paymentType)
+    .first();
+
+  if (!offering) {
+    return json({ error: "This payment option is not configured." }, 503);
+  }
+
+  const isPriority = paymentType === "custom" && payload?.priority === true;
+  const includesPremadeAccess = paymentType === "custom" && payload?.premadeAccess === true;
+  let finalAmount = offering.amount_cents;
+  let finalLabel = offering.label;
+
+  if (paymentType === "tip") {
+    const parsedTip = Number(payload?.amount);
+    if (
+      Number.isSafeInteger(parsedTip) &&
+      parsedTip % 100 === 0 &&
+      parsedTip >= 500 &&
+      parsedTip <= 100000
+    ) {
+      finalAmount = parsedTip;
+      finalLabel = `Supporter tip ($${finalAmount / 100})`;
+    } else {
+      return json({ error: "Invalid tip amount. Please enter a whole-dollar amount between $5 and $1,000." }, 400);
+    }
+  } else if (paymentType === "custom") {
+    // The public interface advertises a $5 baseline. Fail closed if D1 is
+    // changed without also updating that approved public price.
+    if (offering.amount_cents !== CUSTOM_CONTENT_BASE_AMOUNT_CENTS) {
+      return json({ error: "Custom-content pricing is not configured correctly." }, 503);
+    }
+
+    finalAmount = CUSTOM_CONTENT_BASE_AMOUNT_CENTS;
+    finalAmount += (isPriority ? 1699 : 0) + (includesPremadeAccess ? 1000 : 0);
+    const addOns = [isPriority && "Priority push", includesPremadeAccess && "Pre-made access"].filter(Boolean);
+    if (addOns.length) finalLabel = `${offering.label} (${addOns.join(" + ")})`;
+  }
+
+  // Only consume a checkout allocation after the requested amount has passed
+  // validation. This matters for providers that allocate checkout capacity when
+  // an embedded form is created rather than when the payment succeeds.
   const claim = await env.PAYMENTS_DB.prepare(
     `UPDATE payment_offerings
        SET checkout_used = checkout_used + 1
@@ -51,33 +96,6 @@ export async function onRequestPost(context) {
       { error: "This payment option is not available right now.", code: "allocation_unavailable" },
       409,
     );
-  }
-
-  const offering = await env.PAYMENTS_DB.prepare(
-    `SELECT payment_type, label, amount_cents, currency
-       FROM payment_offerings
-      WHERE payment_type = ?`,
-  )
-    .bind(paymentType)
-    .first();
-
-  if (!offering) {
-    return json({ error: "This payment option is not configured." }, 503);
-  }
-
-  const ALLOWED_TIP_AMOUNTS = new Set([1500, 2500, 5000, 7500, 10000]);
-  const isPriority = paymentType === "custom" && payload?.priority === true;
-  const includesPremadeAccess = paymentType === "custom" && payload?.premadeAccess === true;
-  let finalAmount = offering.amount_cents;
-  let finalLabel = offering.label;
-
-  if (paymentType === "tip" && payload?.amount && ALLOWED_TIP_AMOUNTS.has(Number(payload.amount))) {
-    finalAmount = Number(payload.amount);
-    finalLabel = `Supporter tip ($${finalAmount / 100})`;
-  } else if (paymentType === "custom") {
-    finalAmount += (isPriority ? 1699 : 0) + (includesPremadeAccess ? 1000 : 0);
-    const addOns = [isPriority && "Priority push", includesPremadeAccess && "Pre-made access"].filter(Boolean);
-    if (addOns.length) finalLabel = `${offering.label} (${addOns.join(" + ")})`;
   }
 
   const reservationId = crypto.randomUUID();

@@ -16,11 +16,17 @@ const tipToggle = document.querySelector("#tip-toggle");
 const tipTray = document.querySelector("#tip-tray");
 const tipPills = document.querySelectorAll(".tip-pill");
 const tipThumb = document.querySelector(".tip-segmented__thumb");
+const tipCustomToggle = document.querySelector("#tip-custom-toggle");
+const tipCustomField = document.querySelector("#tip-custom-field");
+const tipCustomInput = document.querySelector("#tip-custom-input");
+const tipCustomHint = document.querySelector("#tip-custom-hint");
 const tipSubmit = document.querySelector("#tip-submit");
 
 let isPriority = false;
 let includesPremadeAccess = false;
 let selectedTipAmount = 25;
+let isCustomTip = false;
+const CUSTOM_BASE_PRICE = 5.0;
 
 function getQueuePositions() {
   let base = parseInt(localStorage.getItem("roxy_custom_queue_base"), 10);
@@ -53,10 +59,8 @@ function renderQueueStatus() {
 
 function renderCustomSubmit() {
   if (!customSubmit) return;
-  const addOnTotal = (isPriority ? 16.99 : 0) + (includesPremadeAccess ? 10 : 0);
-  customSubmit.textContent = addOnTotal
-    ? `Continue with request (+$${addOnTotal.toFixed(2)})`
-    : "Continue with request";
+  const total = CUSTOM_BASE_PRICE + (isPriority ? 16.99 : 0) + (includesPremadeAccess ? 10 : 0);
+  customSubmit.innerHTML = `<span>Continue with request ($${total.toFixed(2)})</span>`;
 }
 
 function selectActionCard(card) {
@@ -133,9 +137,10 @@ if (customSubmit) {
       isPriority && "Priority push",
       includesPremadeAccess && "Pre-made access",
     ].filter(Boolean);
+    const total = CUSTOM_BASE_PRICE + (isPriority ? 16.99 : 0) + (includesPremadeAccess ? 10 : 0);
     const label = selectedAddOns.length
-      ? `Request custom content — ${selectedAddOns.join(" + ")}`
-      : "Request custom content";
+      ? `Request custom content — ${selectedAddOns.join(" + ")} ($${total.toFixed(2)})`
+      : `Request custom content ($${total.toFixed(2)})`;
     checkout.select("custom", label, {
       priority: isPriority,
       premadeAccess: includesPremadeAccess,
@@ -151,8 +156,56 @@ if (tipToggle) {
   });
 }
 
+function validateCustomTip() {
+  if (!tipCustomInput || !tipSubmit) return;
+  const raw = tipCustomInput.value.trim();
+  if (!raw) {
+    tipSubmit.disabled = true;
+    tipSubmit.innerHTML = "<span>Enter tip amount</span>";
+    if (tipCustomHint) {
+      tipCustomHint.textContent = "Min $5 · Max $1,000";
+      tipCustomHint.classList.remove("is-error");
+    }
+    return;
+  }
+
+  const val = parseInt(raw, 10);
+  if (isNaN(val) || val < 5) {
+    tipSubmit.disabled = true;
+    tipSubmit.innerHTML = "<span>Minimum tip is $5</span>";
+    if (tipCustomHint) {
+      tipCustomHint.textContent = "Minimum tip amount is $5.";
+      tipCustomHint.classList.add("is-error");
+    }
+  } else if (val > 1000) {
+    tipSubmit.disabled = true;
+    tipSubmit.innerHTML = "<span>Maximum tip is $1,000</span>";
+    if (tipCustomHint) {
+      tipCustomHint.textContent = "Maximum tip amount is $1,000.";
+      tipCustomHint.classList.add("is-error");
+    }
+  } else {
+    selectedTipAmount = val;
+    tipSubmit.disabled = false;
+    tipSubmit.innerHTML = `<span>Continue with $${val}</span>`;
+    if (tipCustomHint) {
+      tipCustomHint.textContent = "Min $5 · Max $1,000";
+      tipCustomHint.classList.remove("is-error");
+    }
+  }
+}
+
 tipPills.forEach((pill, index) => {
   pill.addEventListener("click", () => {
+    isCustomTip = false;
+    if (tipCustomField) tipCustomField.hidden = true;
+    if (tipCustomToggle) tipCustomToggle.textContent = "Or enter custom amount";
+    if (tipCustomInput) tipCustomInput.value = "";
+    if (tipCustomHint) {
+      tipCustomHint.textContent = "Min $5 · Max $1,000";
+      tipCustomHint.classList.remove("is-error");
+    }
+
     tipPills.forEach((p) => {
       p.classList.remove("is-selected");
       p.setAttribute("aria-checked", "false");
@@ -162,19 +215,56 @@ tipPills.forEach((pill, index) => {
     selectedTipAmount = Number(pill.dataset.amount);
 
     if (tipThumb) {
+      tipThumb.style.opacity = "1";
       tipThumb.style.transform = `translateX(${index * 100}%)`;
     }
 
     if (tipSubmit) {
+      tipSubmit.disabled = false;
       tipSubmit.innerHTML = `<span>Continue with $${selectedTipAmount}</span>`;
     }
   });
 });
 
+if (tipCustomToggle) {
+  tipCustomToggle.addEventListener("click", () => {
+    if (!tipCustomField) return;
+    const isOpening = tipCustomField.hidden;
+    if (isOpening) {
+      tipCustomField.hidden = false;
+      tipCustomToggle.textContent = "Use preset amounts";
+      isCustomTip = true;
+      tipPills.forEach((p) => {
+        p.classList.remove("is-selected");
+        p.setAttribute("aria-checked", "false");
+      });
+      if (tipThumb) tipThumb.style.opacity = "0";
+      tipCustomInput?.focus();
+      validateCustomTip();
+    } else {
+      const defaultPill = Array.from(tipPills).find((p) => p.dataset.amount === "25") || tipPills[1];
+      defaultPill?.click();
+    }
+  });
+}
+
+if (tipCustomInput) {
+  tipCustomInput.addEventListener("input", () => {
+    isCustomTip = true;
+    tipPills.forEach((p) => {
+      p.classList.remove("is-selected");
+      p.setAttribute("aria-checked", "false");
+    });
+    if (tipThumb) tipThumb.style.opacity = "0";
+    validateCustomTip();
+  });
+}
+
 syncTipThumb();
 
 if (tipSubmit) {
   tipSubmit.addEventListener("click", () => {
+    if (tipSubmit.disabled || !selectedTipAmount || selectedTipAmount < 5 || selectedTipAmount > 1000) return;
     checkout.select("tip", `Leave a little something ($${selectedTipAmount})`, {
       amount: selectedTipAmount * 100,
       triggerButton: tipSubmit,

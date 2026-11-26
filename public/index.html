@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=20261124-4" />
+    <link rel="stylesheet" href="styles.css?v=20261126-2" />
   </head>
   <body>
     <main class="landing">
@@ -44,12 +44,12 @@
                   <strong>+$16.99</strong>
                 </button>
                 <button class="add-on-option" type="button" role="checkbox" aria-checked="false" data-custom-addon="premade-access">
-                  <span class="add-on-option__copy"><span>Pre-made access</span><small>Get access while you wait</small></span>
+                  <span class="add-on-option__copy"><span>Pre-made access</span><small>Let’s have fun while you wait</small></span>
                   <strong>+$10.00</strong>
                 </button>
               </div>
               <button class="custom-submit" type="button" id="custom-submit">
-                <span>Continue with request</span>
+                <span>Continue with request ($5.00)</span>
               </button>
             </div>
           </div>
@@ -67,6 +67,24 @@
                 <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="50">$50</button>
                 <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="75">$75</button>
                 <button class="tip-pill" type="button" role="radio" aria-checked="false" data-amount="100">$100</button>
+              </div>
+              <button type="button" class="tip-custom-toggle" id="tip-custom-toggle">Or enter custom amount</button>
+              <div class="tip-custom-field" id="tip-custom-field" hidden>
+                <div class="tip-custom-input-wrap">
+                  <span class="tip-custom-currency" aria-hidden="true">$</span>
+                  <input
+                    type="number"
+                    id="tip-custom-input"
+                    class="tip-custom-input"
+                    inputmode="numeric"
+                    min="5"
+                    max="1000"
+                    step="1"
+                    placeholder="Enter amount (min $5)"
+                    aria-label="Custom tip amount in dollars"
+                  />
+                </div>
+                <p class="tip-custom-hint" id="tip-custom-hint">Min $5 · Max $1,000</p>
               </div>
               <button class="tip-submit" type="button" id="tip-submit">
                 <span>Continue with $25</span>
@@ -95,6 +113,6 @@
         <span>ALL RIGHTS RESERVED</span>
       </footer>
     </main>
-    <script type="module" src="scripts/app.js?v=20261124-5"></script>
+    <script type="module" src="scripts/app.js?v=20261126-2"></script>
   </body>
 </html>
