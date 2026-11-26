@@ -3,7 +3,14 @@ const title = document.querySelector("#title"); const detail = document.querySel
 let active;
 const endpoint = `/api/payment-request/${encodeURIComponent(token)}`;
 const currency = (cents, code) => new Intl.NumberFormat("en-US", { style: "currency", currency: code.toUpperCase() }).format(cents / 100);
-function final(heading, text) { title.textContent = heading; detail.textContent = text; home.hidden = false; }
+function final(heading, text) {
+  title.textContent = heading;
+  detail.textContent = text;
+  if (summary) summary.hidden = true;
+  if (checkout) checkout.hidden = true;
+  if (form) form.hidden = true;
+  home.hidden = false;
+}
 function loadStripe() { if (window.Stripe) return Promise.resolve(window.Stripe); return new Promise((resolve, reject) => { const script = document.createElement("script"); script.src = "https://js.stripe.com/v3/"; script.onload = () => resolve(window.Stripe); script.onerror = () => reject(new Error("Secure checkout could not load.")); document.head.append(script); }); }
 
 async function start() {

@@ -8,11 +8,20 @@ const checkout = document.querySelector("#checkout");
 const checkoutStatus = document.querySelector("#checkout-status");
 const form = document.querySelector("#payment-form");
 const submit = document.querySelector("#submit");
+const receiptPrompt = document.querySelector("#receipt-prompt");
+const receiptLink = document.querySelector("#receipt-link");
 let active;
 
 const endpoint = `/api/payment-request/${encodeURIComponent(token)}`;
 const currency = (cents, code) => new Intl.NumberFormat("en-US", { style: "currency", currency: code.toUpperCase() }).format(cents / 100);
-function final(heading, text) { title.textContent = heading; detail.textContent = text; }
+function final(heading, text) {
+  title.textContent = heading;
+  detail.textContent = text;
+  if (confirmAmount) confirmAmount.hidden = true;
+  if (summary) summary.hidden = true;
+  if (checkout) checkout.hidden = true;
+  if (form) form.hidden = true;
+}
 function loadStripe() { if (window.Stripe) return Promise.resolve(window.Stripe); return new Promise((resolve, reject) => { const script = document.createElement("script"); script.src = "https://js.stripe.com/v3/"; script.onload = () => resolve(window.Stripe); script.onerror = () => reject(new Error("Secure checkout could not load.")); document.head.append(script); }); }
 
 async function prepareCheckout() {
@@ -46,7 +55,12 @@ async function start() {
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error);
     const request = payload.request;
-    if (request.status === "paid") return final("Already taken care of.", "This request has already been paid for. Check in with me on Snapchat!");
+    if (request.status === "paid") {
+      final("Already taken care of.", "This request has already been paid for. Grab your receipt below to connect on Snapchat.");
+      if (receiptLink) receiptLink.href = `/payment-confirmed/?payment_request=${encodeURIComponent(token)}`;
+      if (receiptPrompt) receiptPrompt.hidden = false;
+      return;
+    }
     if (!["open", "checkout_ready", "failed"].includes(request.status)) return final("This link has expired.", "This private link is no longer active. Message me on Snapchat if you need a new one.");
     title.textContent = request.description;
     detail.textContent = "This is our private arrangement. When you're ready, confirm below so I can get started on this for you.";
