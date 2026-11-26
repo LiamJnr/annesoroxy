@@ -139,6 +139,9 @@ export async function onRequestPost(context) {
       body: JSON.stringify({
         amount: finalAmount,
         currency: offering.currency,
+        // This live account accepts HandyPay destination payments rather than
+        // direct charges. Platform mode returns no connected-account ID.
+        charge_scope: "platform",
         description: finalLabel,
         metadata: {
           reservation_id: reservationId,

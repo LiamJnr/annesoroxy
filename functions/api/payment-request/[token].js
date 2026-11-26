@@ -34,7 +34,7 @@ export async function onRequestPost({ params, env }) {
     return json({ clientSecret: request.client_secret, publishableKey: request.publishable_key, stripeAccount: request.stripe_account });
   }
 
-  const response = await fetch(HANDYPAY_URL, { method: "POST", headers: { Authorization: `Bearer ${env.HANDYPAY_API_KEY}`, "Content-Type": "application/json", "Idempotency-Key": request.id }, body: JSON.stringify({ amount: request.amount_cents, currency: request.currency, description: request.description, metadata: { payment_request_id: request.id } }) }).catch(() => null);
+  const response = await fetch(HANDYPAY_URL, { method: "POST", headers: { Authorization: `Bearer ${env.HANDYPAY_API_KEY}`, "Content-Type": "application/json", "Idempotency-Key": request.id }, body: JSON.stringify({ amount: request.amount_cents, currency: request.currency, charge_scope: "platform", description: request.description, metadata: { payment_request_id: request.id } }) }).catch(() => null);
   const payload = response && await response.json().catch(() => null);
   const intent = payload?.data;
   if (!response?.ok || !payload?.success || !intent?.payment_intent_id || !intent?.client_secret || !intent?.publishable_key) return json({ error: "Unable to start checkout. Please try again." }, 502);
