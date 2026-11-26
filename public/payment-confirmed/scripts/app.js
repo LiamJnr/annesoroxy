@@ -72,23 +72,31 @@ function renderReceipt(payment) {
   const formattedAmount = formatCurrency(payment.amountCents, payment.currency);
 
   if (receiptItem) {
-    receiptItem.textContent = payment.paymentType === "premade" ? "Pre-made Content" : "Custom Content Request";
+    if (payment.description) {
+      receiptItem.textContent = payment.description;
+    } else {
+      receiptItem.textContent = payment.paymentType === "premade" ? "Pre-made Content" : "Custom Content Request";
+    }
   }
 
-  if (receiptPriorityRow && receiptPriority) {
+  if (receiptPriorityRow) {
     receiptPriorityRow.hidden = !payment.priority;
-    receiptPriority.textContent = payment.priority ? "Included (Top Priority)" : "Standard";
+    if (receiptPriority) {
+      receiptPriority.textContent = payment.priority ? "Included (Top Priority)" : "Standard";
+    }
   }
 
-  if (receiptPremadeRow && receiptPremade) {
+  if (receiptPremadeRow) {
     receiptPremadeRow.hidden = !payment.premadeAccess;
-    receiptPremade.textContent = payment.premadeAccess ? "Included (Instant Access)" : "Standard";
+    if (receiptPremade) {
+      receiptPremade.textContent = payment.premadeAccess ? "Included (Instant Access)" : "Standard";
+    }
   }
 
   if (receiptAmount) receiptAmount.textContent = formattedAmount;
-  if (receiptRef) receiptRef.textContent = payment.id;
+  if (receiptRef) receiptRef.textContent = payment.id || payment.token || "—";
   if (receiptTime) receiptTime.textContent = formattedTime;
-  if (receiptAuth) receiptAuth.textContent = computeSecurityToken(payment.id, payment.paidAt);
+  if (receiptAuth) receiptAuth.textContent = computeSecurityToken(payment.id || payment.token || "", payment.paidAt);
 
   receiptCard.hidden = false;
 }
@@ -97,13 +105,15 @@ if (receiptReveal) {
   receiptReveal.addEventListener("click", () => {
     if (!confirmedCustomPayment) return;
 
-    // Trigger file download
-    const downloadAnchor = document.createElement("a");
-    downloadAnchor.href = `/api/premade-access-receipt?reservation_id=${encodeURIComponent(confirmedCustomPayment.id)}`;
-    downloadAnchor.download = `roxy-receipt-${confirmedCustomPayment.id.slice(0, 8)}.html`;
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    // Trigger file download for reservations
+    if (!confirmedCustomPayment.isPrivateRequest) {
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.href = `/api/premade-access-receipt?reservation_id=${encodeURIComponent(confirmedCustomPayment.id)}`;
+      downloadAnchor.download = `roxy-receipt-${confirmedCustomPayment.id.slice(0, 8)}.html`;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
 
     // Render receipt view in-place for screenshotting
     renderReceipt(confirmedCustomPayment);
@@ -180,11 +190,31 @@ async function checkPrivateRequestStatus() {
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error);
     if (payload.request.status === "paid") {
-      showFinal("Payment confirmed.", "Your arranged request has been paid. Thank you.", true);
+      if (mark) {
+        mark.textContent = "✓";
+        mark.style.background = "";
+      }
+      title.textContent = "You’re in.";
+      message.textContent = "Your spot is locked in. Grab your receipt below to connect on Snapchat.";
+      confirmedCustomPayment = {
+        id: payload.request.id || paymentRequestToken.slice(0, 16).toUpperCase(),
+        token: paymentRequestToken,
+        description: payload.request.description || "Private Content Request",
+        amountCents: payload.request.amountCents,
+        currency: payload.request.currency,
+        paidAt: payload.request.paidAt || Date.now(),
+        priority: false,
+        premadeAccess: false,
+        isPrivateRequest: true,
+      };
+      if (receiptPrompt) receiptPrompt.hidden = false;
+      if (receiptCard) receiptCard.hidden = true;
+      if (snapchatLink) snapchatLink.hidden = true;
+      if (homeLink) homeLink.hidden = true;
       return;
     }
     if (payload.request.status === "failed" || payload.request.status === "expired") {
-      showFinal("Payment wasn’t completed.", "No confirmed payment was received. Please contact Roxy if you need a new link.", false);
+      showFinal("Payment didn’t go through.", "Your card wasn’t charged. Hit me up on Snapchat if you need a fresh link.", false);
       return;
     }
     checks += 1;

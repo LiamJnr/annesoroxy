@@ -3,10 +3,10 @@ const HANDYPAY_URL = "https://api.handypay.me/api/v1/payment-intents";
 
 function json(body, status = 200) { return Response.json(body, { status, headers: { "Cache-Control": "no-store" } }); }
 function expired(request) { return request.expires_at !== null && request.expires_at <= Date.now(); }
-function publicRequest(request) { return { description: request.description, amountCents: request.amount_cents, currency: request.currency, status: expired(request) && request.status === "open" ? "expired" : request.status, expiresAt: request.expires_at }; }
+function publicRequest(request) { return { id: request.id, token: request.token, description: request.description, amountCents: request.amount_cents, currency: request.currency, status: expired(request) && request.status === "open" ? "expired" : request.status, expiresAt: request.expires_at, paidAt: request.paid_at }; }
 
 async function findRequest(env, token) {
-  return env.PAYMENTS_DB.prepare(`SELECT id, token, description, amount_cents, currency, status, expires_at, handypay_intent_id, client_secret, publishable_key, stripe_account FROM payment_requests WHERE token = ?`).bind(token).first();
+  return env.PAYMENTS_DB.prepare(`SELECT id, token, description, amount_cents, currency, status, expires_at, paid_at, handypay_intent_id, client_secret, publishable_key, stripe_account FROM payment_requests WHERE token = ?`).bind(token).first();
 }
 
 export async function onRequestGet({ params, env }) {

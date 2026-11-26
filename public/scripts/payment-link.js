@@ -17,9 +17,9 @@ function loadStripe() { if (window.Stripe) return Promise.resolve(window.Stripe)
 
 async function prepareCheckout() {
   confirmAmount.disabled = true;
-  confirmAmount.innerHTML = '<span class="spinner" aria-hidden="true"></span><span>Preparing checkout…</span>';
+  confirmAmount.innerHTML = '<span class="spinner" aria-hidden="true"></span><span>Getting things ready…</span>';
   checkout.hidden = false;
-  checkoutStatus.textContent = "Preparing secure checkout…";
+  checkoutStatus.textContent = "Getting things ready for you…";
   try {
     const response = await fetch(endpoint, { method: "POST" });
     const intent = await response.json();
@@ -34,9 +34,9 @@ async function prepareCheckout() {
     confirmAmount.hidden = true;
   } catch (error) {
     checkout.hidden = true;
-    detail.textContent = error.message || "Checkout could not be prepared. Please try again.";
+    detail.textContent = error.message || "Aww, checkout could not be prepared. Please try again.";
     confirmAmount.disabled = false;
-    confirmAmount.textContent = "Confirm amount & pay";
+    confirmAmount.textContent = "Lock In This Request";
   }
 }
 
@@ -46,15 +46,15 @@ async function start() {
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error);
     const request = payload.request;
-    if (request.status === "paid") return final("Already paid.", "This private request has already been completed.");
-    if (!["open", "checkout_ready", "failed"].includes(request.status)) return final("This link is unavailable.", "This private payment link is no longer available.");
+    if (request.status === "paid") return final("Already taken care of.", "This request has already been paid for. Check in with me on Snapchat!");
+    if (!["open", "checkout_ready", "failed"].includes(request.status)) return final("This link has expired.", "This private link is no longer active. Message me on Snapchat if you need a new one.");
     title.textContent = request.description;
-    detail.textContent = "This is a private, fixed-price request. The amount cannot be changed.";
+    detail.textContent = "This is our private arrangement. When you're ready, confirm below so I can get started on this for you.";
     amount.textContent = currency(request.amountCents, request.currency);
     summary.hidden = false;
     confirmAmount.hidden = false;
   } catch (error) {
-    final("This link is unavailable.", error.message || "Please contact Roxy for a new payment link.");
+    final("This link has expired.", error.message || "This private link is no longer active. Message me on Snapchat if you need a new one.");
   }
 }
 
@@ -63,7 +63,7 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!active) return;
   submit.disabled = true;
-  submit.innerHTML = '<span class="spinner" aria-hidden="true"></span><span>Processing payment…</span>';
+  submit.innerHTML = '<span class="spinner" aria-hidden="true"></span><span>Any moment from now…</span>';
   try {
     const validation = await active.elements.submit();
     if (validation.error) throw validation.error;
@@ -72,10 +72,10 @@ form.addEventListener("submit", async (event) => {
     if (result.error) throw result.error;
     location.assign(returnUrl);
   } catch (error) {
-    detail.textContent = error.message || "Payment could not be submitted. Please review your details and try again.";
+    detail.textContent = error.message || "Aww, your payment didn’t go through. Double-check your card details and try again.";
   } finally {
     submit.disabled = false;
-    submit.textContent = "Complete payment";
+    submit.textContent = "Lock In My Request";
   }
 });
 
