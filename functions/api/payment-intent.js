@@ -160,6 +160,12 @@ export async function onRequestPost(context) {
 
   const handypayPayload = await handypayResponse.json().catch(() => null);
   if (!handypayResponse.ok || !handypayPayload?.success || !handypayPayload?.data) {
+    console.error("HandyPay PaymentIntent creation failed", {
+      status: handypayResponse.status,
+      errorCode: handypayPayload?.error?.code ?? null,
+      errorMessage: handypayPayload?.error?.message ?? null,
+      requestId: handypayPayload?.request_id ?? null,
+    });
     await releaseSharedAllocation(env.PAYMENTS_DB, finalAmount);
     await env.PAYMENTS_DB.prepare(
       "UPDATE checkout_reservations SET status = 'creation_failed' WHERE id = ?",
@@ -171,6 +177,10 @@ export async function onRequestPost(context) {
 
   const intent = handypayPayload.data;
   if (typeof intent.payment_intent_id !== "string") {
+    console.error("HandyPay returned an incomplete PaymentIntent", {
+      status: handypayResponse.status,
+      requestId: handypayPayload?.request_id ?? null,
+    });
     await releaseSharedAllocation(env.PAYMENTS_DB, finalAmount);
     await env.PAYMENTS_DB.prepare(
       "UPDATE checkout_reservations SET status = 'creation_failed' WHERE id = ?",
