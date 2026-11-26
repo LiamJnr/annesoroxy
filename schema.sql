@@ -12,6 +12,16 @@ CREATE TABLE IF NOT EXISTS payment_offerings (
   CHECK (checkout_used <= checkout_limit)
 );
 
+-- A singleton balance representing HandyPay's shared embedded-checkout
+-- processing capacity. Both custom-content requests and supporter tips draw
+-- from this balance in cents.
+CREATE TABLE IF NOT EXISTS checkout_allocation (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  limit_cents INTEGER NOT NULL CHECK (limit_cents >= 0),
+  used_cents INTEGER NOT NULL DEFAULT 0 CHECK (used_cents >= 0),
+  CHECK (used_cents <= limit_cents)
+);
+
 CREATE TABLE IF NOT EXISTS checkout_reservations (
   id TEXT PRIMARY KEY,
   payment_type TEXT NOT NULL REFERENCES payment_offerings(payment_type),

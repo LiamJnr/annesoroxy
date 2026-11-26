@@ -2,6 +2,19 @@ const HANDYPAY_PAYMENT_INTENTS_URL = "https://api.handypay.me/api/v1/payment-int
 const VALID_PAYMENT_TYPES = new Set(["custom", "tip"]);
 const CUSTOM_CONTENT_BASE_AMOUNT_CENTS = 500;
 
+async function releaseSharedAllocation(database, amountCents) {
+  await database
+    .prepare(
+      `UPDATE checkout_allocation
+          SET used_cents = used_cents - ?
+        WHERE id = 1
+          AND used_cents >= ?`,
+    )
+    .bind(amountCents, amountCents)
+    .run()
+    .catch(() => {});
+}
+
 function json(body, status = 200) {
   return Response.json(body, {
     status,
@@ -38,7 +51,8 @@ export async function onRequestPost(context) {
   const offering = await env.PAYMENTS_DB.prepare(
     `SELECT payment_type, label, amount_cents, currency
        FROM payment_offerings
-      WHERE payment_type = ?`,
+      WHERE payment_type = ?
+        AND active = 1`,
   )
     .bind(paymentType)
     .first();
@@ -78,22 +92,21 @@ export async function onRequestPost(context) {
     if (addOns.length) finalLabel = `${offering.label} (${addOns.join(" + ")})`;
   }
 
-  // Only consume a checkout allocation after the requested amount has passed
-  // validation. This matters for providers that allocate checkout capacity when
-  // an embedded form is created rather than when the payment succeeds.
-  const claim = await env.PAYMENTS_DB.prepare(
-    `UPDATE payment_offerings
-       SET checkout_used = checkout_used + 1
-     WHERE payment_type = ?
-       AND active = 1
-       AND checkout_used < checkout_limit`,
+  // HandyPay allocates a single shared monetary balance when an embedded
+  // checkout is initiated. Claim the full amount atomically only after all
+  // browser-supplied selections have been validated.
+  const allocationClaim = await env.PAYMENTS_DB.prepare(
+    `UPDATE checkout_allocation
+        SET used_cents = used_cents + ?
+      WHERE id = 1
+        AND used_cents <= limit_cents - ?`,
   )
-    .bind(paymentType)
+    .bind(finalAmount, finalAmount)
     .run();
 
-  if (claim.meta.changes !== 1) {
+  if (allocationClaim.meta.changes !== 1) {
     return json(
-      { error: "This payment option is not available right now.", code: "allocation_unavailable" },
+      { error: "Checkout capacity is unavailable right now.", code: "allocation_unavailable" },
       409,
     );
   }
@@ -101,13 +114,18 @@ export async function onRequestPost(context) {
   const reservationId = crypto.randomUUID();
   const createdAt = Date.now();
 
-  await env.PAYMENTS_DB.prepare(
-    `INSERT INTO checkout_reservations
-      (id, payment_type, amount_cents, currency, priority, premade_access, status, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
-  )
-    .bind(reservationId, offering.payment_type, finalAmount, offering.currency, Number(isPriority), Number(includesPremadeAccess), createdAt)
-    .run();
+  try {
+    await env.PAYMENTS_DB.prepare(
+      `INSERT INTO checkout_reservations
+        (id, payment_type, amount_cents, currency, priority, premade_access, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)`,
+    )
+      .bind(reservationId, offering.payment_type, finalAmount, offering.currency, Number(isPriority), Number(includesPremadeAccess), createdAt)
+      .run();
+  } catch {
+    await releaseSharedAllocation(env.PAYMENTS_DB, finalAmount);
+    return json({ error: "Unable to start secure checkout. Please try again." }, 503);
+  }
 
   let handypayResponse;
   try {
@@ -131,6 +149,7 @@ export async function onRequestPost(context) {
       }),
     });
   } catch {
+    await releaseSharedAllocation(env.PAYMENTS_DB, finalAmount);
     await env.PAYMENTS_DB.prepare(
       "UPDATE checkout_reservations SET status = 'creation_failed' WHERE id = ?",
     )
@@ -141,6 +160,7 @@ export async function onRequestPost(context) {
 
   const handypayPayload = await handypayResponse.json().catch(() => null);
   if (!handypayResponse.ok || !handypayPayload?.success || !handypayPayload?.data) {
+    await releaseSharedAllocation(env.PAYMENTS_DB, finalAmount);
     await env.PAYMENTS_DB.prepare(
       "UPDATE checkout_reservations SET status = 'creation_failed' WHERE id = ?",
     )
@@ -151,6 +171,7 @@ export async function onRequestPost(context) {
 
   const intent = handypayPayload.data;
   if (typeof intent.payment_intent_id !== "string") {
+    await releaseSharedAllocation(env.PAYMENTS_DB, finalAmount);
     await env.PAYMENTS_DB.prepare(
       "UPDATE checkout_reservations SET status = 'creation_failed' WHERE id = ?",
     )
